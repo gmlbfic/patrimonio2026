@@ -220,9 +220,55 @@ footer p{max-width:80ch;margin:0 0 8px}
 .toast.show{opacity:1}
 @media (prefers-reduced-motion:reduce){.toast{transition:none}}
 @media print{header.hero,aside,.alts,.actions,.swap,footer{display:none!important}main{display:block}body{background:#fff}}
+
+/* Small readability and keyboard-access improvements. */
+body{line-height:1.6}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.skip-link{position:fixed;top:8px;left:8px;z-index:1000;padding:10px 16px;background:var(--surface);color:var(--ink);border:2px solid var(--accent);border-radius:8px;transform:translateY(-160%)}
+.skip-link:focus{transform:translateY(0)}
+button,select,.mapcap a{min-height:44px}
+button{touch-action:manipulation}
+.checks label{min-height:44px;align-items:center}
+.checks input{width:20px;height:20px;flex-shrink:0}
+.hint,.times label,.note,.card .where,.alt .hrs,.mapcap{font-size:.9rem}
+.tag{font-size:.82rem;color:var(--ink)}
+.card .what strong{color:var(--ink)}
+.card .go{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+.chip[aria-pressed="true"],.alt button{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip[aria-pressed="true"] .dot{color:var(--accent-ink)}
+.card .cacts{position:static;flex-wrap:wrap;margin-bottom:10px}
+.card .swap,.card .rm,.card .mv{font-size:.88rem;color:var(--ink);min-width:44px}
+.card h3{padding-right:0;line-height:1.35}
+.card .num{background:var(--accent);color:var(--accent-ink)}
+.altgrid{grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr))}
+.card,.alt,.pb,footer p{overflow-wrap:anywhere}
+footer p{max-width:85ch;line-height:1.65}
+@media(max-width:400px){main,.community{padding-left:12px;padding-right:12px}.panel{padding:16px}.hero h1{font-size:clamp(2.2rem,10vw,2.8rem)}.plist-head{flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important}}
 </style>
+<!-- Google Analytics: aggregate visits and named actions only. -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-VVW2VETK3W"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('consent', 'default', {ad_storage:'denied', ad_user_data:'denied', ad_personalization:'denied'});
+  gtag('js', new Date());
+  let analyticsReferrer = '';
+  try { analyticsReferrer = new URL(document.referrer).origin; } catch (_) {}
+  gtag('config', 'G-VVW2VETK3W', {
+    allow_google_signals: false,
+    allow_ad_personalization_signals: false,
+    page_location: location.origin + location.pathname,
+    page_referrer: analyticsReferrer
+  });
+  const analyticsEvents = new Set(['copiar_recorrido','recorrido_sorpresa','reiniciar_recorrido','deshacer_cambios','sumar_parada','quitar_parada','cambiar_parada','ordenar_parada','abrir_mapa','abrir_recorrido_maps','abrir_whatsapp']);
+  function trackAction(name) {
+    if (analyticsEvents.has(name)) gtag('event', name, {send_to:'G-VVW2VETK3W'});
+  }
+</script>
 </head>
 <body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
 
 <header class="hero">
   <div class="hero-in">
@@ -262,19 +308,19 @@ footer p{max-width:80ch;margin:0 0 8px}
   <svg class="hero-edge" viewBox="0 0 1200 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 18V8Q600 -8 1200 8V18z" fill="currentColor"/></svg>
 </header>
 
-<main>
+<main id="contenido" tabindex="-1">
   <aside class="panel" aria-label="Preferencias">
     <div class="field">
       <span class="lab">Día</span>
-      <div class="seg" id="daySeg">
+      <div class="seg" id="daySeg" role="group" aria-label="Día del recorrido">
         <button data-v="s" aria-pressed="true">Sábado 3</button>
         <button data-v="d" aria-pressed="false">Domingo 4</button>
       </div>
     </div>
     <div class="field">
-      <span class="lab">¿Desde dónde salís?</span>
+      <label class="lab" for="zone">¿Desde dónde salís?</label>
       <select id="zone"></select>
-      <div style="margin-top:10px" class="seg" id="radiusSeg">
+      <div style="margin-top:10px" class="seg" id="radiusSeg" role="group" aria-label="Distancia del recorrido">
         <button data-v="all" aria-pressed="false">Toda la ciudad</button>
         <button data-v="near" aria-pressed="true">Zonas cercanas</button>
         <button data-v="same" aria-pressed="false">Solo mi zona</button>
@@ -290,12 +336,12 @@ footer p{max-width:80ch;margin:0 0 8px}
     </div>
     <div class="field">
       <span class="lab">Qué te interesa</span>
-      <div class="chips" id="chips"></div>
+      <div class="chips" id="chips" role="group" aria-label="Intereses, podés elegir varios"></div>
       <div class="hint">Podés elegir varios. Más coincidencias suben la prioridad.</div>
     </div>
     <div class="field">
       <span class="lab">Ritmo</span>
-      <div class="seg" id="paceSeg">
+      <div class="seg" id="paceSeg" role="group" aria-label="Ritmo del recorrido">
         <button data-v="1.3" aria-pressed="false">Tranquilo</button>
         <button data-v="1" aria-pressed="true">Normal</button>
         <button data-v="0.8" aria-pressed="false">Intenso</button>
@@ -307,11 +353,11 @@ footer p{max-width:80ch;margin:0 0 8px}
     </div>
   </aside>
 
-  <section aria-live="polite">
+  <section aria-labelledby="routeTitle">
     <div class="summary">
       <div>
         <h2 id="routeTitle">Tu recorrido</h2>
-        <div class="meta" id="routeMeta"></div>
+        <div class="meta" id="routeMeta" role="status" aria-atomic="true"></div>
       </div>
       <div class="actions">
         <button class="btn lucky" id="luckyBtn">Voy a tener suerte</button>
@@ -322,7 +368,7 @@ footer p{max-width:80ch;margin:0 0 8px}
     </div>
     <div class="mapbox" id="mapbox"></div>
     <ol class="route" id="route"></ol>
-    <div id="pinWarn"></div>
+    <div id="pinWarn" role="status"></div>
 
     <section class="alts">
       <h2>Otras opciones que encajan</h2>
@@ -343,14 +389,14 @@ footer p{max-width:80ch;margin:0 0 8px}
       <div>
         <p class="lead">Sumá tu actividad para que otras personas la encuentren. Al enviarla se abre WhatsApp con los datos listos para mandar a la organización de esta guía. Todo lo que se carga acá figura como propuesta no oficial: no forma parte de la guía del MEC ni está verificado.</p>
         <div id="commForm">
-          <div class="f"><label for="pTitle">Qué es</label><input type="text" id="pTitle" maxlength="80" placeholder="Ej.: Recorrido por los murales del barrio"></div>
-          <div class="f"><label for="pOrg">Quién organiza</label><input type="text" id="pOrg" maxlength="80" placeholder="Colectivo, institución o persona"></div>
-          <div class="f"><label for="pPlace">Dónde</label><input type="text" id="pPlace" maxlength="100" placeholder="Dirección o punto de encuentro, y barrio"></div>
+          <div class="f"><label for="pTitle">Qué es</label><input type="text" id="pTitle" aria-required="true" maxlength="80" placeholder="Ej.: Recorrido por los murales del barrio"></div>
+          <div class="f"><label for="pOrg">Quién organiza</label><input type="text" id="pOrg" aria-required="true" maxlength="80" placeholder="Colectivo, institución o persona"></div>
+          <div class="f"><label for="pPlace">Dónde</label><input type="text" id="pPlace" aria-required="true" maxlength="100" placeholder="Dirección o punto de encuentro, y barrio"></div>
           <div class="f"><label>Qué día</label>
-            <div class="seg" id="pDay"><button type="button" data-v="s" aria-pressed="true">Sábado 3</button><button type="button" data-v="d" aria-pressed="false">Domingo 4</button></div></div>
+            <div class="seg" id="pDay" role="group" aria-label="Día de la propuesta"><button type="button" data-v="s" aria-pressed="true">Sábado 3</button><button type="button" data-v="d" aria-pressed="false">Domingo 4</button></div></div>
           <div class="f"><label>Horario</label>
-            <div class="row"><select id="pFrom" aria-label="Desde"></select><select id="pTo" aria-label="Hasta"></select></div></div>
-          <div class="f"><label>Categoría</label><div class="chips" id="pCat"></div></div>
+            <div class="row"><select id="pFrom" aria-label="Hora de inicio de la propuesta"></select><select id="pTo" aria-label="Hora de fin de la propuesta"></select></div></div>
+          <div class="f"><label>Categoría</label><div class="chips" id="pCat" role="group" aria-label="Categoría de la propuesta"></div></div>
           <div class="f"><label for="pDesc">Contá un poco más <small>(opcional)</small></label><textarea id="pDesc" maxlength="280" placeholder="Hasta 280 caracteres"></textarea></div>
           <button class="btn" id="pSend" type="button">Publicar y enviar por WhatsApp</button>
           <div class="formmsg" id="pMsg" role="status"></div>
@@ -358,7 +404,7 @@ footer p{max-width:80ch;margin:0 0 8px}
       </div>
       <div>
         <div class="plist-head"><h3>Propuestas de la gente</h3>
-          <div class="seg" id="plDay" style="min-width:220px"><button type="button" data-v="s" aria-pressed="true">Sábado 3</button><button type="button" data-v="d" aria-pressed="false">Domingo 4</button></div></div>
+          <div class="seg" id="plDay" role="group" aria-label="Día de las propuestas publicadas" style="min-width:220px"><button type="button" data-v="s" aria-pressed="true">Sábado 3</button><button type="button" data-v="d" aria-pressed="false">Domingo 4</button></div></div>
         <div class="plist" id="plist"><div class="comm-off">Cargando propuestas…</div></div>
       </div>
     </div>
@@ -372,7 +418,8 @@ footer p{max-width:80ch;margin:0 0 8px}
   <div class="credits">
     <p>Hecho con cariño y poco tiempo por Gonzalo López Baliñas | 2026</p>
     <p><strong>Contacto:</strong> gonmlb [@] gmail.com</p>
-    <p><strong>Declaración de uso de inteligencia artificial:</strong> esta herramienta se desarrolló con asistencia de Claude (Anthropic), un modelo de inteligencia artificial, que intervino en la extracción y estructuración de los datos de la guía oficial, en la programación y en el diseño visual. La idea, la curaduría, los criterios de selección y la revisión son responsabilidad del autor.</p>
+    <p><strong>Uso de IA:</strong> desarrollado con asistencia de Opus (Anthropic) y Astra (OpenAI). La selección de contenidos y la revisión final son responsabilidad del autor.</p>
+    <p><strong>Estadísticas:</strong> usamos Google Analytics para medir visitas y acciones generales. No enviamos el contenido de las propuestas ni de los mensajes de WhatsApp a las estadísticas.</p>
     <p><strong>Uso no comercial:</strong> proyecto sin fines de lucro y de acceso gratuito. No puede utilizarse, reproducirse ni adaptarse con fines comerciales. No está vinculado ni avalado por el Ministerio de Educación y Cultura ni por la Comisión del Patrimonio Cultural de la Nación.</p>
   </div>
 </footer>
@@ -1061,11 +1108,11 @@ function copyRoute(){
   let txt = `Día del Patrimonio 2026, ${day} de octubre\n\n`;
   route.forEach(r=>{ const a=r.c.a; txt += `${fmt(r.sl.st)}–${fmt(r.sl.en)}  ${a.n} (${a.b})${r.sl.ev?`\n   ${r.sl.ev}`:''}${a.r?`\n   ${a.r}`:''}\n`; });
   txt += `\nFuente: Guía oficial MEC 2026. Verificá horarios antes de salir.`;
-  const done = ()=>toast('Recorrido copiado');
+  const done = ()=>{ trackAction('copiar_recorrido'); toast('Recorrido copiado'); };
   try{ navigator.clipboard.writeText(txt).then(done,()=>fallback(txt)); }catch(e){ fallback(txt); }
 }
 function fallback(txt){
-  try{ const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('Recorrido copiado'); }
+  try{ const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select(); const copied=document.execCommand('copy'); ta.remove(); if(!copied) throw new Error('copy'); trackAction('copiar_recorrido'); toast('Recorrido copiado'); }
   catch(e){ toast('No se pudo copiar; seleccioná el texto manualmente'); }
 }
 function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800); }
@@ -1180,6 +1227,7 @@ async function sendProp(){
   const body={titulo:titulo.slice(0,80),organiza:organiza.slice(0,80),lugar:lugar.slice(0,100),desc:desc.slice(0,280),dia:P.day,desde,hasta,cat:P.cat,creado:new Date().toISOString()};
   // 1) WhatsApp: opened right away, inside the click, so browsers don't block it
   const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waText(body))}`;
+  trackAction('abrir_whatsapp');
   let win=null; try{ win = window.open(waUrl,'_blank','noopener'); }catch(e){}
   const waLink = `<a href="${waUrl}" target="_blank" rel="noopener">abrí WhatsApp desde acá</a>`;
   const m=document.getElementById('pMsg');
@@ -1223,6 +1271,27 @@ async function sendProp(){
     document.getElementById('plist').innerHTML='<div class="comm-off">No se pudieron cargar las propuestas. Recargá la página para reintentar.</div>';
   });
 })();
+
+// Count only fixed action names; never send form values, link URLs or route details.
+document.addEventListener('click', event => {
+  const target = event.target.closest('button, a');
+  if (!target || target.disabled) return;
+  const actions = {luckyBtn:'recorrido_sorpresa', restartBtn:'reiniciar_recorrido', resetBtn:'deshacer_cambios'};
+  let action = actions[target.id];
+  if (!action && target.matches('#alts [data-p]')) action = 'sumar_parada';
+  if (!action && target.matches('#route .rm')) action = 'quitar_parada';
+  if (!action && target.matches('#route .swap')) action = 'cambiar_parada';
+  if (!action && target.matches('#route .mv')) action = 'ordenar_parada';
+  if (!action && target.tagName === 'A') {
+    try {
+      const url = new URL(target.href);
+      if (url.hostname === 'www.google.com' && url.pathname.startsWith('/maps/')) {
+        action = url.pathname.startsWith('/maps/dir/') ? 'abrir_recorrido_maps' : 'abrir_mapa';
+      } else if (url.hostname === 'wa.me') action = 'abrir_whatsapp';
+    } catch (_) {}
+  }
+  if (action) trackAction(action);
+}, true);
 </script>
 </body>
 </html>
