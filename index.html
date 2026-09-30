@@ -770,7 +770,10 @@ function score(a){
   if(S.pinned.has(a.id)) s += 50;
   return {s,hits};
 }
+/* Canelones: entra desde cualquier zona de partida cuando hay tiempo para ir y volver */
+const CN_MIN_WINDOW = 300; // minutos disponibles como mínimo (5 h)
 function inRadius(a){
+  if(a.z==='CN' && S.zone!=='CN') return S.to - S.from >= CN_MIN_WINDOW;
   if(S.radius==='all') return true;
   if(S.radius==='same') return a.z===S.zone;
   return a.z===S.zone || travel(S.zone,a.z) <= 20;
@@ -819,7 +822,8 @@ function plan(){
       const tr = route.length ? travel(loc,c.a.z) : (c.a.z===S.zone ? 0 : travel(S.zone,c.a.z));
       const sl = earliest(c.a, t+tr); if(!sl) continue;
       const wait = sl.st - (t+tr);
-      const val = c.s*10 + (S.noise?S.noise[c.a.id]:0) + (sl.ev?6:0) - wait*0.15 - tr*1.1 - (sl.en-sl.st>150?8:0);
+      const cn = c.a.z==='CN' && S.zone!=='CN'; // el traslado largo no la descarta
+      const val = c.s*10 + (S.noise?S.noise[c.a.id]:0) + (sl.ev?6:0) + (cn?12:0) - wait*0.15 - tr*(cn?0:1.1) - (sl.en-sl.st>150?8:0);
       if(!best || val>best.val) best = {c,sl,tr,wait,val};
     }
     if(!best) break;
@@ -1028,6 +1032,7 @@ function render(){
         <p class="what">${r.sl.ev?`<strong>${r.sl.ev}.</strong> `:''}${a.x}</p>
         <div class="tags">${tags}</div>
         ${a.r?`<div class="note">${a.r}</div>`:''}
+        ${a.z==='CN'&&S.zone!=='CN'?`<div class="note">Queda fuera de Montevideo: unos ${travel(S.zone,'CN')} min de traslado estimado desde ${ZSHORT[S.zone]}.</div>`:''}
         <a class="go" href="${gmap(a)}" target="_blank" rel="noopener">Cómo llegar</a></div></li>`;
     });
     R.innerHTML = h;
