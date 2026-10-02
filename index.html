@@ -365,7 +365,7 @@ footer p{max-width:85ch;line-height:1.65}
     <div class="field checks">
       <label><input type="checkbox" id="acc"> Solo lugares con accesibilidad universal declarada</label>
       <label><input type="checkbox" id="nores"> Evitar propuestas que piden reserva o inscripción</label>
-      <label><input type="checkbox" id="dry"> Solo techado, por si llueve <span class="hint" style="margin:0">(saca lo que es al aire libre)</span></label>
+      <label><input type="checkbox" id="dry"> Solo techado, por si llueve <span class="hint" style="margin:0">(saca todo lo que tiene partes al aire libre)</span></label>
     </div>
   </aside>
 
@@ -802,7 +802,7 @@ function candidates(){
     if(!O.length && !E.length) continue;
     if(S.acc && !a.acc) continue;
     if(S.nores && a.res) continue;
-    if(S.dry && a.out===1) continue;
+    if(S.dry && a.out) continue; // solo techado: saca lo que es al aire libre, total o parcial
     if(!inRadius(a) && !S.pinned.has(a.id)) continue;
     const fits = O.some(([x,y])=>Math.min(y,S.to)-Math.max(x,S.from) >= 20) || E.some(([t,len])=>t>=S.from && t+Math.min(len,60)<=S.to);
     if(!fits) continue;
@@ -1185,7 +1185,7 @@ document.getElementById('restartBtn').addEventListener('click',()=>{
 /* Rain banner: toggles the "solo techado" filter */
 function syncRain(){
   const on=S.dry;
-  document.getElementById('rainText').innerHTML = on ? '<strong>Mostrando solo actividades techadas.</strong> Lo que es al aire libre quedó afuera.' : '<strong>¿Llueve?</strong> Ahora podés quedarte solo con las actividades techadas.';
+  document.getElementById('rainText').innerHTML = on ? '<strong>Mostrando solo actividades techadas.</strong> Quedó afuera todo lo que es al aire libre, total o parcialmente.' : '<strong>¿Llueve?</strong> Ahora podés quedarte solo con las actividades techadas.';
   document.getElementById('rainBtn').textContent = on ? 'Ver todas' : 'Ver solo techadas';
   document.getElementById('dry').checked = on;
 }
