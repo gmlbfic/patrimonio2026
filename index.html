@@ -43,6 +43,10 @@ a{color:var(--accent)}
 button,select,input,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 
+.rainbar{background:var(--yellow);color:var(--yellow-ink)}
+.rainbar-in{max-width:1180px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:.95rem}
+.rainbar-in span{flex:1 1 260px}
+.rainbar button{border:0;background:var(--yellow-ink);color:var(--yellow);font-weight:800;border-radius:999px;padding:8px 16px;cursor:pointer;font-size:.88rem}
 /* ---------- Hero ---------- */
 header.hero{background:var(--hero);color:var(--hero-ink);position:relative;overflow:hidden}
 .hero-in{max-width:1180px;margin:0 auto;padding:44px 20px 40px;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:24px;align-items:center;position:relative}
@@ -211,6 +215,8 @@ section.alts > p{margin:0 0 16px;color:var(--muted);font-size:.92rem}
 .pcount{color:var(--muted);font-size:.86rem}
 .pbody{padding:0 18px 16px}
 .pnote{margin:0;font-size:.84rem;color:var(--muted);max-width:44ch}
+.tag.wx{display:inline-flex;align-items:center;gap:5px;background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--ink)}
+.tag.wx svg{flex:0 0 auto}
 .tag.unof{background:transparent;border:1.5px dashed var(--muted);color:var(--muted)}
 
 footer{max-width:1180px;margin:0 auto;padding:22px 20px 40px;border-top:1px solid var(--line);color:var(--muted);font-size:.86rem}
@@ -263,7 +269,7 @@ footer p{max-width:85ch;line-height:1.65}
     page_location: location.origin + location.pathname,
     page_referrer: analyticsReferrer
   });
-  const analyticsEvents = new Set(['copiar_recorrido','recorrido_sorpresa','reiniciar_recorrido','deshacer_cambios','sumar_parada','quitar_parada','cambiar_parada','ordenar_parada','abrir_mapa','abrir_recorrido_maps','abrir_whatsapp']);
+  const analyticsEvents = new Set(['copiar_recorrido','recorrido_sorpresa','reiniciar_recorrido','deshacer_cambios','sumar_parada','quitar_parada','cambiar_parada','ordenar_parada','abrir_mapa','abrir_recorrido_maps','abrir_whatsapp','filtro_lluvia']);
   function trackAction(name) {
     if (analyticsEvents.has(name)) gtag('event', name, {send_to:'G-VVW2VETK3W'});
   }
@@ -272,6 +278,13 @@ footer p{max-width:85ch;line-height:1.65}
 <body>
 <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
+<div class="rainbar" id="rainbar" role="region" aria-label="Aviso de lluvia">
+  <div class="rainbar-in">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 15h10a4 4 0 0 0 0-8 5.5 5.5 0 0 0-10.6 1.6A3.2 3.2 0 0 0 7 15z"/><path d="M8 18l-1 3M12 18l-1 3M16 18l-1 3"/></svg>
+    <span id="rainText"><strong>¿Llueve?</strong> Ahora podés quedarte solo con las actividades techadas.</span>
+    <button type="button" id="rainBtn">Ver solo techadas</button>
+  </div>
+</div>
 <header class="hero">
   <div class="hero-in">
     <div>
@@ -352,6 +365,7 @@ footer p{max-width:85ch;line-height:1.65}
     <div class="field checks">
       <label><input type="checkbox" id="acc"> Solo lugares con accesibilidad universal declarada</label>
       <label><input type="checkbox" id="nores"> Evitar propuestas que piden reserva o inscripción</label>
+      <label><input type="checkbox" id="dry"> Solo techado, por si llueve <span class="hint" style="margin:0">(saca lo que es al aire libre)</span></label>
     </div>
   </aside>
 
@@ -416,7 +430,7 @@ footer p{max-width:85ch;line-height:1.65}
 <footer>
   <p><strong>Fuente:</strong> <a href="https://www.gub.uy/ministerio-educacion-cultura/patrimonio-uruguay/guia-actividades-dia-del-patrimonio" target="_blank" rel="noopener">Guía de actividades del Día del Patrimonio 2026</a>, Comisión del Patrimonio Cultural de la Nación (MEC), publicada el 25/09/2026. Todas las actividades son gratuitas.</p>
   <p><strong>Cobertura:</strong> incluye las propuestas presenciales de Montevideo del sábado 3 y el domingo 4, más algunas propuestas no oficiales revisadas, marcadas como tales (dos de ellas en Canelones). Quedan fuera las actividades de otras fechas (viernes 2, martes 6, sábado 10) y las visitas virtuales. El interior del país no está cargado; consultalo en el PDF oficial.</p>
-  <p><strong>Estimaciones:</strong> los traslados entre zonas y la duración de cada visita son aproximaciones propias, no datos de la guía. Los horarios pueden cambiar y varias propuestas al aire libre se suspenden por lluvia: verificá antes de salir.</p>
+  <p><strong>Estimaciones:</strong> los traslados entre zonas, la duración de cada visita y qué propuestas son techadas o al aire libre son aproximaciones propias, no datos de la guía. Los horarios pueden cambiar y varias propuestas al aire libre se suspenden por lluvia: verificá antes de salir.</p>
   <div class="credits">
     <p>Hecho con cariño en mi tiempo libre. Gon López Baliñas | 2026 | gonmlb [@] gmail.com</p>
     <p><strong>Uso de IA:</strong> desarrollado con asistencia de Opus (Anthropic) y Astra (OpenAI). La selección de contenidos y la revisión final son responsabilidad del autor.</p>
@@ -476,13 +490,13 @@ function travel(a,b){ if(!a) return 0; return (TT[a]&&TT[a][b]) ?? (TT[b]&&TT[b]
  dur min estimated, o open windows per day, ev fixed events per day [start, minutes, label], x description, r reserva note */
 const D = [
 {n:'Torre de las Telecomunicaciones (ANTEL)',b:'Aguada',z:'CE',t:['arq','fam'],acc:1,dur:60,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Vista 360° de Montevideo desde la torre, murales del Taller Torres García y actividades recreativas. Intérpretes LSU.'},
-{n:'Explanada del Palacio Legislativo',b:'Aguada',z:'CE',t:['mem','mus'],acc:1,dur:60,ev:{d:[['16:30',90,'Banda de Músicos, demostración del Batallón Florida, reseña histórica y arriado de pabellones (18 h)']]},x:'Acto con banda, movimientos militares y arriado de pabellones.'},
+{n:'Explanada del Palacio Legislativo',out:1,b:'Aguada',z:'CE',t:['mem','mus'],acc:1,dur:60,ev:{d:[['16:30',90,'Banda de Músicos, demostración del Batallón Florida, reseña histórica y arriado de pabellones (18 h)']]},x:'Acto con banda, movimientos militares y arriado de pabellones.'},
 {n:'Museo del Carnaval',b:'Ciudad Vieja (Rambla)',z:'CV',t:['mus','mem'],dur:60,o:{s:[['11:00','17:00']],d:[['11:00','17:00']]},x:'Muestras sobre la fiesta popular; destaca "Un tablado en cada esquina" (tablados 1920–1950). Accesibilidad parcial.'},
 {n:'Museo Sagrada Familia',b:'Aguada',z:'CE',t:['cien','fam'],dur:40,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Colecciones de ciencias naturales, antropología e historia, con visitas guiadas por alumnos.'},
 {n:'Teatro Victoria',b:'Aguada',z:'CE',t:['arq','mus'],dur:45,ev:{s:[['11:00',45,'Visita guiada'],['12:30',45,'Visita guiada'],['14:00',45,'Visita guiada'],['15:00',45,'Visita guiada'],['16:00',40,'Presentación del Coro del BSE']]},x:'Visitas guiadas por el teatro y coro del BSE.'},
 {n:'Facultad de Medicina (Udelar)',b:'Aguada',z:'NO',t:['ind','cien','arq'],dur:60,ev:{s:[['11:00',60,'Visita guiada'],['14:00',60,'Visita guiada'],['17:00',60,'Visita guiada']],d:[['11:00',60,'Visita guiada'],['14:00',60,'Visita guiada'],['17:00',60,'Visita guiada']]},x:'Recorrido por Sala de Consejo, anfiteatros, bibliotecas y Museo de Anatomía; materiales sobre aportes de la medicina indígena.'},
 {n:'Facultad de Química (Udelar)',b:'Aguada',z:'NO',t:['cien','fam','ind'],dur:60,o:{s:[['10:00','17:00']]},x:'Stands interactivos de enseñanza e investigación, con actividades vinculadas a la temática del año.'},
-{n:'Circuito de Memoria del Municipio C (en ómnibus)',b:'Aguada',z:'CE',t:['mem'],acc:1,dur:240,ev:{s:[['11:00',240,'Recorrido en ómnibus por sitios de memoria del pasado reciente (sale frente al Palacio Legislativo)']]},x:'Recorrido guiado por sitios de memoria: Muchachas de Abril, ex Hogar Burgues, UNTMRA, Textil La Aurora y otros.'},
+{n:'Circuito de Memoria del Municipio C (en ómnibus)',out:2,b:'Aguada',z:'CE',t:['mem'],acc:1,dur:240,ev:{s:[['11:00',240,'Recorrido en ómnibus por sitios de memoria del pasado reciente (sale frente al Palacio Legislativo)']]},x:'Recorrido guiado por sitios de memoria: Muchachas de Abril, ex Hogar Burgues, UNTMRA, Textil La Aurora y otros.'},
 {n:'Museo del Tabaco',b:'Aguada',z:'CE',t:['ofi','mem'],dur:50,o:{s:[['11:00','17:00']],d:[['11:00','17:00']]},x:'Historia del tabaco en Uruguay y evolución tecnológica de la industria; visitas guiadas todo el horario.'},
 {n:'Palacio de la Luz (UTE)',b:'Aguada',z:'CE',t:['arq','ofi'],acc:1,dur:60,o:{s:[['10:00','17:00']],d:[['10:00','17:00']]},x:'Visita patrimonial al edificio y su acervo artístico. Última recorrida a las 16 h.'},
 {n:'Ex Casa Quinta Piñeyrua',b:'Aires Puros',z:'NO',t:['arq'],acc:1,dur:45,o:{s:[['10:00','17:00']],d:[['10:00','17:00']]},x:'Visita a la casa y el parque.'},
@@ -499,21 +513,21 @@ const D = [
 {n:'Montevideo al Sur',b:'Barrio Sur',z:'CE',t:['gas','ind'],dur:45,o:{s:[['12:00','18:00']],d:[['12:00','18:00']]},x:'Degustación gratuita con guiños a comida ancestral y vinos de bodegas antiguas.'},
 {n:'Museo San Bernardino',b:'Barrio Sur',z:'CE',t:['mem','arq'],acc:1,dur:45,o:{d:[['14:30','19:00']]},x:'Documentación del antiguo convento vinculado a la formación de Artigas; visita al templo.'},
 {n:'Museo Geominero (DINAMIGE)',b:'Bella Vista',z:'NO',t:['cien','ind'],dur:45,o:{s:[['10:00','18:00']]},x:'Cómo la geodiversidad del territorio influyó en la vida de los pueblos indígenas. Acceso por escalera.',r:'Talleres (11–13 y 15–17 h) con inscripción por correo hasta el jueves 1/10'},
-{n:'CSOE: el roble de 161 años',b:'Belvedere',z:'OE',t:['cien'],dur:40,o:{s:[['10:00','17:00']],d:[['10:00','17:00']]},x:'Parque con el Quercus robur más grande del país y especies autóctonas. Se suspende con mal tiempo.'},
-{n:'Casaquinta de Luis Alberto de Herrera',b:'Brazo Oriental',z:'NO',t:['mem','arq','cien'],acc:1,dur:45,o:{s:[['12:00','18:00']],d:[['12:00','18:00']]},ev:{s:[['14:30',45,'Visita mediada por casa, jardín y fotogalería de arroyos'],['16:00',45,'Visita mediada']],d:[['14:30',45,'Visita mediada por casa, jardín y fotogalería de arroyos'],['16:00',45,'Visita mediada']]},x:'Museo Histórico Nacional: vivienda, jardín y fotogalería sobre arroyos y áreas verdes.'},
+{n:'CSOE: el roble de 161 años',out:1,b:'Belvedere',z:'OE',t:['cien'],dur:40,o:{s:[['10:00','17:00']],d:[['10:00','17:00']]},x:'Parque con el Quercus robur más grande del país y especies autóctonas. Se suspende con mal tiempo.'},
+{n:'Casaquinta de Luis Alberto de Herrera',out:2,b:'Brazo Oriental',z:'NO',t:['mem','arq','cien'],acc:1,dur:45,o:{s:[['12:00','18:00']],d:[['12:00','18:00']]},ev:{s:[['14:30',45,'Visita mediada por casa, jardín y fotogalería de arroyos'],['16:00',45,'Visita mediada']],d:[['14:30',45,'Visita mediada por casa, jardín y fotogalería de arroyos'],['16:00',45,'Visita mediada']]},x:'Museo Histórico Nacional: vivienda, jardín y fotogalería sobre arroyos y áreas verdes.'},
 {n:'UNTMRA: muestra fotográfica',b:'Brazo Oriental',z:'NO',t:['mem'],acc:1,dur:30,o:{s:[['13:00','15:00']]},x:'Historia del sindicato metalúrgico.'},
 {n:'Aduana de Oribe y Museo del Arma de Ingenieros',b:'Buceo',z:'ES',t:['mem','arq'],dur:50,o:{s:[['13:00','17:00']],d:[['13:00','17:00']]},ev:{s:[['15:30',60,'Banda de Músicos del Ejército']]},x:'Edificio histórico sobre la rambla y museo militar.'},
-{n:'Campus Luisi Janicki (ex Veterinaria)',b:'Buceo',z:'ES',t:['ind','arq','cien'],acc:1,dur:60,o:{s:[['10:00','16:00']]},ev:{s:[['11:00',60,'Charla de Mónica Sans: la continuidad indígena invisibilizada'],['10:00',60,'Recorrido guiado por arquitectos'],['12:00',60,'Recorrido guiado por arquitectos']]},x:'Recorridos por el conjunto edilicio y muestra "Visibles: presencia de la trama indígena".'},
-{n:'Cementerio Británico',b:'Buceo',z:'ES',t:['col','mus','mem'],acc:1,dur:140,ev:{s:[['15:00',140,'Circuito de historias de inmigrantes y gaitas celtas en la capilla']]},x:'Recorrido mediado por historias de vida de inmigrantes y concierto de gaitas. Intérpretes LSU.'},
+{n:'Campus Luisi Janicki (ex Veterinaria)',out:2,b:'Buceo',z:'ES',t:['ind','arq','cien'],acc:1,dur:60,o:{s:[['10:00','16:00']]},ev:{s:[['11:00',60,'Charla de Mónica Sans: la continuidad indígena invisibilizada'],['10:00',60,'Recorrido guiado por arquitectos'],['12:00',60,'Recorrido guiado por arquitectos']]},x:'Recorridos por el conjunto edilicio y muestra "Visibles: presencia de la trama indígena".'},
+{n:'Cementerio Británico',out:1,b:'Buceo',z:'ES',t:['col','mus','mem'],acc:1,dur:140,ev:{s:[['15:00',140,'Circuito de historias de inmigrantes y gaitas celtas en la capilla']]},x:'Recorrido mediado por historias de vida de inmigrantes y concierto de gaitas. Intérpretes LSU.'},
 {n:'Museo Naval',b:'Buceo',z:'ES',t:['ind','mem','fam'],acc:1,dur:50,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Historia naval; destaca "Una canoa, muchas historias", sobre la canoa monóxila y la navegación indígena.'},
 {n:'Facultad de Odontología',b:'Parque Batlle',z:'ES',t:['cien','arq'],dur:50,o:{s:[['14:00','20:00']]},x:'Recorridos por el edificio, Sala del Consejo y Museo de Anatomía; coro y charla histórica.'},
 {n:'IIBCE Abierto (Clemente Estable)',b:'Buceo',z:'ES',t:['cien','fam'],acc:1,dur:60,o:{s:[['14:00','20:00']]},x:'Stands interactivos, recorridos, charlas y actividades artísticas.'},
 {n:'Yacht Club Uruguayo',b:'Buceo',z:'ES',t:['arq'],acc:1,dur:40,o:{s:[['09:00','17:00']]},x:'Visita al edificio, Patrimonio Histórico Nacional.'},
 {n:'ANCAP: exposición 95 años',b:'Capurro',z:'NO',t:['ofi','mem'],dur:50,o:{s:[['09:00','16:00']],d:[['09:00','16:00']]},x:'Piezas del acervo de ANCAP en el Polo Industrial Capurro.'},
 {n:'Casona Lussich (Servicio Oceanográfico de la Armada)',b:'Capurro',z:'NO',t:['arq','cien'],dur:40,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Recorrida por los salones de la casona.'},
-{n:'CEDEL Carrasco (ex Hotel del Lago)',b:'Carrasco Norte',z:'CA',t:['arq','gas','fam'],acc:1,dur:50,o:{s:[['13:00','18:00']]},x:'Edificio histórico, fotogalería del Parque Rivera y feria gastronómica y artesanal.'},
-{n:'Museo y Parque Fernando García',b:'Carrasco Norte',z:'CA',t:['arte','ofi'],acc:1,dur:50,o:{s:[['10:00','19:00']],d:[['10:00','19:00']]},x:'Exposición en Sala Las Caballerizas y encuentro de motos clásicas y custom.'},
-{n:'Sociedad Criolla Elías Regules',b:'Carrasco Norte',z:'CA',t:['mem','gas','mus','fam'],dur:90,o:{s:[['11:00','18:00']],d:[['11:00','18:00']]},x:'Poblado criollo de fines del siglo XIX, pulpería y museo; folclore en vivo y gastronomía criolla.'},
+{n:'CEDEL Carrasco (ex Hotel del Lago)',out:2,b:'Carrasco Norte',z:'CA',t:['arq','gas','fam'],acc:1,dur:50,o:{s:[['13:00','18:00']]},x:'Edificio histórico, fotogalería del Parque Rivera y feria gastronómica y artesanal.'},
+{n:'Museo y Parque Fernando García',out:2,b:'Carrasco Norte',z:'CA',t:['arte','ofi'],acc:1,dur:50,o:{s:[['10:00','19:00']],d:[['10:00','19:00']]},x:'Exposición en Sala Las Caballerizas y encuentro de motos clásicas y custom.'},
+{n:'Sociedad Criolla Elías Regules',out:2,b:'Carrasco Norte',z:'CA',t:['mem','gas','mus','fam'],dur:90,o:{s:[['11:00','18:00']],d:[['11:00','18:00']]},x:'Poblado criollo de fines del siglo XIX, pulpería y museo; folclore en vivo y gastronomía criolla.'},
 {n:'Casa Domínguez Nieto: grabados',b:'Carrasco',z:'CA',t:['arte'],acc:1,res:1,dur:45,ev:{s:[['11:00',45,'Visita guiada'],['14:30',45,'Visita guiada'],['16:00',45,'Visita guiada']],d:[['11:00',45,'Visita guiada'],['14:30',45,'Visita guiada'],['16:00',45,'Visita guiada']]},x:'Grabados en linóleo (1940–1990) sobre lugares, oficios, candombe y tango.',r:'Inscripción por WhatsApp/SMS 099 641 352'},
 {n:'Escuela Naval',b:'Carrasco',z:'CA',t:['arq','mem'],dur:50,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Visitas guiadas por las instalaciones fundadas en 1907.'},
 {n:'Museo de Autos Clásicos',b:'Carrasco',z:'CA',t:['ofi','fam'],dur:50,o:{s:[['11:00','18:00']]},x:'Vehículos históricos con contenidos interactivos.'},
@@ -526,7 +540,7 @@ const D = [
 {n:'Capilla y Colegio del Huerto',b:'Centro',z:'CE',t:['arq','mem'],acc:1,dur:45,o:{s:[['13:00','17:00']],d:[['13:00','17:00']]},x:'Primera escuela de mujeres (1864); visitas guiadas y charlas.'},
 {n:'Casa Mayor Udelar: ceremonia charrúa',b:'Centro',z:'CE',t:['ind'],dur:45,o:{s:[['10:00','18:00']]},x:'Performance de ceremonia indígena charrúa (Consejo de la Nación Charrúa).'},
 {n:'Centro de Exposiciones Subte',b:'Centro',z:'CE',t:['arte'],acc:1,dur:45,o:{s:[['12:00','18:45']],d:[['12:00','18:45']]},ev:{s:[['14:00',60,'Charla y ensayo abierto "De esto no se habla x25"']]},x:'Rulfo Álvarez, obra reunida de Dani Umpi y Proyecto Mulita.'},
-{n:'Centro de Fotografía de Montevideo',b:'Centro',z:'CE',t:['arte','ind'],dur:45,o:{s:[['09:30','14:30']],d:[['09:30','14:30']]},x:'Muestra "Raíces indígenas" en Plaza Independencia y exposiciones en la sede de 18 de Julio.'},
+{n:'Centro de Fotografía de Montevideo',out:2,b:'Centro',z:'CE',t:['arte','ind'],dur:45,o:{s:[['09:30','14:30']],d:[['09:30','14:30']]},x:'Muestra "Raíces indígenas" en Plaza Independencia y exposiciones en la sede de 18 de Julio.'},
 {n:'Clube Brasileiro',b:'Centro',z:'CE',t:['col','mus','arq'],acc:1,dur:30,o:{s:[['10:00','15:00']]},ev:{s:[['12:00',30,'Coro del Clube']]},x:'Historia del club.'},
 {n:'Estudios SONDOR: homenaje a Aníbal Sampayo',b:'Centro',z:'CE',t:['mus'],dur:90,ev:{s:[['15:00',120,'Espectáculo musical (Carlos Alberto Rodríguez y María Elena Melo a las 15:30)']]},x:'Estudio histórico de grabación.'},
 {n:'Euskal Erria',b:'Centro',z:'CE',t:['col','gas','arq'],dur:75,o:{s:[['10:00','18:00']]},ev:{s:[['12:30',60,'Pintxo-pote en la cantina'],['14:30',60,'Frontón con pelotaris']]},x:'Recorridos por la sede, genealogía vasca, pintxos y frontón. Acceso por escalera.'},
@@ -539,29 +553,29 @@ const D = [
 {n:'Palacio Piria (Suprema Corte)',b:'Centro',z:'CE',t:['arq'],dur:45,o:{s:[['10:00','17:00']],d:[['10:00','17:00']]},x:'Recorrido libre; visitas guiadas cada hora de 11 a 16 h, sin inscripción.'},
 {n:'Palacio Salvo: sala Tendiendo puentes',b:'Centro',z:'CE',t:['arte','fam'],acc:1,dur:45,o:{s:[['14:00','21:00']],d:[['14:00','21:00']]},ev:{s:[['15:00',60,'Taller de mandalas para niños']],d:[['15:00',60,'Taller de cerámica para todas las edades']]},x:'Obras interactivas de más de 30 artistas, visita guiada cada hora.'},
 {n:'Palacio Santos (Cancillería)',b:'Centro',z:'CE',t:['arq'],acc:1,dur:45,o:{s:[['10:00','18:00']]},x:'Visitas guiadas por funcionarios especializados.'},
-{n:'Observación de aves en Parque Batlle',b:'Parque Batlle',z:'ES',t:['cien'],dur:120,ev:{s:[['09:00',120,'Caminata de observación de aves (Aves Uruguay)']]},x:'Caminata guiada al aire libre.'},
-{n:'Plaza Fabini: tangos y milongas',b:'Centro',z:'CE',t:['mus'],acc:1,dur:30,o:{s:[['13:00','17:00']],d:[['13:00','17:00']]},x:'El colectivo No Me Olvides invita a bailar. Se suspende por lluvia.'},
+{n:'Observación de aves en Parque Batlle',out:1,b:'Parque Batlle',z:'ES',t:['cien'],dur:120,ev:{s:[['09:00',120,'Caminata de observación de aves (Aves Uruguay)']]},x:'Caminata guiada al aire libre.'},
+{n:'Plaza Fabini: tangos y milongas',out:1,b:'Centro',z:'CE',t:['mus'],acc:1,dur:30,o:{s:[['13:00','17:00']],d:[['13:00','17:00']]},x:'El colectivo No Me Olvides invita a bailar. Se suspende por lluvia.'},
 {n:'Auditorio Adela Reta (Sodre)',b:'Centro',z:'CE',t:['mus','arq'],acc:1,dur:45,o:{s:[['14:00','18:30']],d:[['14:00','18:30']]},ev:{s:[['16:00',60,'Milongas en el auditorio']],d:[['16:00',60,'Milongas en el auditorio']]},x:'Libre circulación, audiocuento y milongas.'},
 {n:'Teatro Alianza: reflexiones sobre patrimonio',b:'Centro',z:'CE',t:['mem'],dur:60,ev:{s:[['11:00',60,'Charla sobre identidad y memoria colectiva']]},x:'Charla.'},
 {n:'Teatro Circular',b:'Centro',z:'CE',t:['arq','arte'],dur:30,o:{s:[['11:00','15:30']],d:[['11:00','15:30']]},x:'Visitas guiadas por la institución (72 años).'},
-{n:'Trolebuses históricos en Plaza Independencia',b:'Centro',z:'CE',t:['ofi','fam'],dur:25,o:{s:[['10:00','19:00']],d:[['10:00','19:00']]},ev:{s:[['13:00',30,'Charla sobre la historia del sistema'],['17:00',30,'Charla sobre la historia del sistema']],d:[['13:00',30,'Charla sobre la historia del sistema'],['17:00',30,'Charla sobre la historia del sistema']]},x:'Ansaldo San Giorgio y Alfa Romeo restaurados.'},
+{n:'Trolebuses históricos en Plaza Independencia',out:1,b:'Centro',z:'CE',t:['ofi','fam'],dur:25,o:{s:[['10:00','19:00']],d:[['10:00','19:00']]},ev:{s:[['13:00',30,'Charla sobre la historia del sistema'],['17:00',30,'Charla sobre la historia del sistema']],d:[['13:00',30,'Charla sobre la historia del sistema'],['17:00',30,'Charla sobre la historia del sistema']]},x:'Ansaldo San Giorgio y Alfa Romeo restaurados.'},
 {n:'Fábrica Nacional de Sombreros',b:'Cerrito de la Victoria',z:'NO',t:['ofi','col'],dur:45,o:{s:[['10:00','17:00']],d:[['10:00','17:00']]},x:'Minimuseo de sombreros; fábrica con técnicas de principios del siglo XX.',r:'Recorrido por la fábrica (10:30, 14 y 16 h) con reserva: 098 690 519'},
-{n:'Museo Blandengues de Artigas',b:'Cerrito',z:'NO',t:['mem','fam'],dur:60,o:{s:[['10:00','12:00'],['14:00','17:00']]},x:'Museo, plaza de armas, caballos moros y perros cimarrones.'},
+{n:'Museo Blandengues de Artigas',out:2,b:'Cerrito',z:'NO',t:['mem','fam'],dur:60,o:{s:[['10:00','12:00'],['14:00','17:00']]},x:'Museo, plaza de armas, caballos moros y perros cimarrones.'},
 {n:'Asociación Cultural Uruguay Lituania',b:'Cerro',z:'OE',t:['col','gas'],dur:45,o:{d:[['11:00','17:00']]},x:'Historia de la comunidad lituana, taller de cocina y charlas.'},
 {n:'Casa de la Pólvora: indígenas en el Cerro',b:'Cerro',z:'OE',t:['ind'],acc:1,dur:40,o:{s:[['14:00','18:00']]},x:'Exposición.'},
 {n:'Museo de los Trabajadores del Frigorífico',b:'Cerro',z:'OE',t:['ofi','mem','col'],dur:50,o:{s:[['09:00','18:00']],d:[['09:00','18:00']]},x:'Memoria obrera, sindical y de corrientes migratorias.'},
-{n:'Fortaleza General Artigas (Cerro)',b:'Cerro',z:'OE',t:['mem','arq','fam'],dur:60,o:{s:[['10:00','17:00']],d:[['10:00','17:00']]},ev:{s:[['16:00',40,'Banda de Músicos']],d:[['16:00',40,'Banda de Músicos']]},x:'Museo militar en la cima del Cerro; salva de cañones sin horario fijo.'},
+{n:'Fortaleza General Artigas (Cerro)',out:2,b:'Cerro',z:'OE',t:['mem','arq','fam'],dur:60,o:{s:[['10:00','17:00']],d:[['10:00','17:00']]},ev:{s:[['16:00',40,'Banda de Músicos']],d:[['16:00',40,'Banda de Músicos']]},x:'Museo militar en la cima del Cerro; salva de cañones sin horario fijo.'},
 {n:'SOMOS Taller de cerámica',b:'Ciudad Vieja',z:'CV',t:['ind','arte','fam'],acc:1,dur:45,o:{s:[['14:00','17:00']]},x:'Piezas inspiradas en arte precolombino y mesa para probar técnicas ancestrales con arcilla.'},
-{n:'Puerto de Montevideo (ANP)',b:'Ciudad Vieja',z:'CV',t:['ofi'],dur:40,o:{s:[['09:00','17:00']],d:[['09:00','17:00']]},x:'Grúas antiguas, telémetro del Graf Spee y vista de la operativa. Acceso Yacaré.'},
+{n:'Puerto de Montevideo (ANP)',out:1,b:'Ciudad Vieja',z:'CV',t:['ofi'],dur:40,o:{s:[['09:00','17:00']],d:[['09:00','17:00']]},x:'Grúas antiguas, telémetro del Graf Spee y vista de la operativa. Acceso Yacaré.'},
 {n:'Al Maestro Taller',b:'Ciudad Vieja',z:'CV',t:['arte','ind'],dur:40,o:{s:[['10:00','12:30']],d:[['10:00','12:30']]},x:'Taller abierto; el sábado se fabrican pinturas con materiales naturales.',r:'Talleres de pinturas naturales (sáb. 14 y 16 h) con inscripción: almaestrotaller@gmail.com'},
 {n:'Archivo Nacional de la Imagen y la Palabra',b:'Ciudad Vieja',z:'CV',t:['mus','mem'],dur:30,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Muestra "Opus 95" sobre la Orquesta Sinfónica del Sodre.'},
-{n:'Base Naval del Puerto',b:'Ciudad Vieja',z:'CV',t:['fam','mem'],dur:75,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Buques, demostraciones de buzos, helicóptero, velero Capitán Miranda y banda de la Armada.'},
+{n:'Base Naval del Puerto',out:2,b:'Ciudad Vieja',z:'CV',t:['fam','mem'],dur:75,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Buques, demostraciones de buzos, helicóptero, velero Capitán Miranda y banda de la Armada.'},
 {n:'Casa Lavalleja (Museo Histórico Nacional)',b:'Ciudad Vieja',z:'CV',t:['mem','gas'],dur:45,o:{s:[['12:00','18:00']],d:[['12:00','18:00']]},ev:{s:[['14:00',45,'Visita a "El mantel como bandera": alimentación e identidad'],['15:30',45,'Visita a "El mantel como bandera"']],d:[['14:00',45,'Visita a "El mantel como bandera": alimentación e identidad'],['15:30',45,'Visita a "El mantel como bandera"']]},x:'Salas y patios; planta alta por escalera.'},
 {n:'Casa Montero (Museo Romántico)',b:'Ciudad Vieja',z:'CV',t:['mem','arq'],dur:40,o:{s:[['12:00','18:00']],d:[['12:00','18:00']]},ev:{s:[['15:00',45,'Hemeroteca con materiales sobre temática indígena']],d:[['15:00',45,'Hemeroteca con materiales sobre temática indígena']]},x:'Museo Romántico, sala de Musicología y hemeroteca.'},
 {n:'Casa Rivera (Museo Histórico Nacional)',b:'Ciudad Vieja',z:'CV',t:['ind','mem'],dur:45,ev:{s:[['14:30',45,'Recorrido mediado por la exposición sobre raíces indígenas'],['16:00',45,'Recorrido mediado']],d:[['14:30',45,'Recorrido mediado por la exposición sobre raíces indígenas'],['16:00',45,'Recorrido mediado']]},x:'Exposición temporal diseñada para la consigna 2026.'},
 {n:'Casa Vaeza: pueblos chaná y guaraní',b:'Ciudad Vieja',z:'CV',t:['ind','mem','fam'],dur:45,o:{s:[['10:00','17:00']],d:[['10:00','17:00']]},x:'Conversatorios, artefactos indígenas y leyendas interactivas (sede del Partido Nacional).'},
 {n:'Centro Cultural de España',b:'Ciudad Vieja',z:'CV',t:['arte','mus'],acc:1,dur:45,o:{s:[['11:00','19:00']]},x:'Exposición fotográfica, azotea, charlas y cierre musical.'},
-{n:'Museo Afroviviente (intervención)',b:'Ciudad Vieja',z:'CV',t:['arte','mem'],dur:30,ev:{s:[['14:00',60,'Performance al aire libre en la Puerta de la Ciudadela']]},x:'Intervención artística colectiva.'},
+{n:'Museo Afroviviente (intervención)',out:1,b:'Ciudad Vieja',z:'CV',t:['arte','mem'],dur:30,ev:{s:[['14:00',60,'Performance al aire libre en la Puerta de la Ciudadela']]},x:'Intervención artística colectiva.'},
 {n:'Dirección Nacional de Aduanas',b:'Ciudad Vieja',z:'CV',t:['arq','mem'],acc:1,dur:40,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Visitas guiadas a una institución de 1779.'},
 {n:'Loterías y Quinielas',b:'Ciudad Vieja',z:'CV',t:['arq','mem'],dur:30,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},ev:{s:[['17:30',30,'Sorteo en vivo de Quiniela y Tómbola']]},x:'Bolilleros del siglo XIX en el edificio de sorteos.'},
 {n:'Edificio Escollera: arqueología urbana',b:'Ciudad Vieja',z:'CV',t:['cien','mem'],dur:30,o:{s:[['11:00','15:00']],d:[['14:00','17:00']]},x:'Objetos recuperados en excavaciones de viviendas del siglo XIX.'},
@@ -573,7 +587,7 @@ const D = [
 {n:'Casona Mauá',b:'Ciudad Vieja',z:'CV',t:['arq','gas','mus'],acc:1,dur:45,o:{s:[['10:00','19:00']]},x:'Arte, historia del Barón de Mauá, cava y performances de tango.'},
 {n:'Espacio Cultural Edificio Artigas',b:'Ciudad Vieja',z:'CV',t:['arte'],acc:1,dur:30,o:{s:[['11:00','17:00']]},ev:{s:[['12:00',40,'Charla sobre la muestra']]},x:'Muestra "La belleza del arte en lo cotidiano".'},
 {n:'Espacio Zorrilla (ex Club Católico)',b:'Ciudad Vieja',z:'CV',t:['arq'],acc:1,dur:40,o:{s:[['10:00','14:00']]},x:'Recorrido guiado en grupos reducidos.'},
-{n:'Buses antiguos y trolebuses (Juncal y Buenos Aires)',b:'Ciudad Vieja',z:'CV',t:['ofi','fam'],dur:60,o:{s:[['10:00','19:00']],d:[['10:00','19:00']]},x:'Exposición de trolebuses y línea histórica en buses antiguos por Ciudad Vieja, ramblas y viaducto portuario.'},
+{n:'Buses antiguos y trolebuses (Juncal y Buenos Aires)',out:2,b:'Ciudad Vieja',z:'CV',t:['ofi','fam'],dur:60,o:{s:[['10:00','19:00']],d:[['10:00','19:00']]},x:'Exposición de trolebuses y línea histórica en buses antiguos por Ciudad Vieja, ramblas y viaducto portuario.'},
 {n:'Fundación Banco República',b:'Ciudad Vieja',z:'CV',t:['arq','arte'],acc:1,dur:40,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Papel moneda e identidad; arquitectura art déco.'},
 {n:'Fundación de Cultura Universitaria',b:'Ciudad Vieja',z:'CV',t:['ind'],dur:60,o:{s:[['10:00','18:00']]},ev:{s:[['17:00',60,'Documental "Los últimos charrúas" y libro con el informe de Paul Rivet']]},x:'Exposición 60 años de FCU.'},
 {n:'BROU Casa Central: Museo del Gaucho',b:'Ciudad Vieja',z:'CV',t:['arq','mem'],dur:45,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Museo del Gaucho y la Moneda y primer piso del edificio.'},
@@ -581,7 +595,7 @@ const D = [
 {n:'Junta Departamental (Casa de Francisco Gómez)',b:'Ciudad Vieja',z:'CV',t:['arq','mem'],acc:1,dur:45,o:{s:[['11:00','17:00']]},x:'Monumento Histórico Nacional, hallazgos arqueológicos coloniales y Sala de Sesiones. Ingreso hasta 16:45.'},
 {n:'MTOP: Guardianes',b:'Ciudad Vieja',z:'CV',t:['arq','ind'],dur:30,o:{s:[['10:00','16:30']],d:[['10:00','16:30']]},x:'Detrás de escena de tres obras intervenidas y sus vínculos con raíces indígenas.'},
 {n:'Modo Casona',grp:'modo',b:'Ciudad Vieja',z:'CV',t:['arte','mus'],dur:40,o:{s:[['12:00','17:00']],d:[['12:00','17:00']]},ev:{s:[['15:00',40,'Visita guiada']],d:[['14:00',40,'Visita guiada']]},x:'Open studio de artistas residentes, feria de arte y música en vivo.'},
-{n:'Museo Andes 1972 (escenario en Rincón)',b:'Ciudad Vieja',z:'CV',t:['mus','mem'],dur:60,ev:{s:[['12:00',60,'Braulio López (Los Olimareños) en vivo'],['13:00',60,'Charla de Carlitos Páez']]},x:'Evento al aire libre.'},
+{n:'Museo Andes 1972 (escenario en Rincón)',out:1,b:'Ciudad Vieja',z:'CV',t:['mus','mem'],dur:60,ev:{s:[['12:00',60,'Braulio López (Los Olimareños) en vivo'],['13:00',60,'Charla de Carlitos Páez']]},x:'Evento al aire libre.'},
 {n:'MAPI Museo de Arte Precolombino e Indígena',b:'Ciudad Vieja',z:'CV',t:['ind','arte'],acc:1,dur:60,o:{s:[['10:30','17:30']],d:[['10:30','17:30']]},ev:{d:[['16:00',60,'Conferencia de Claudio Rama: máscaras de raíz indígena']]},x:'Colección indígena, tres salas "Raíces Indígenas" y muestra "Uruguay en guaraní".'},
 {n:'Palacio Taranco: conciertos',b:'Ciudad Vieja',z:'CV',t:['mus','arq'],acc:1,dur:60,ev:{s:[['12:00',60,'Concierto de trombones y Coro Montevideo'],['16:00',60,'Concierto de trombones y Coro Montevideo']]},x:'Salón de Baile del Museo de Artes Decorativas.'},
 {n:'Museo de la Casa de Gobierno',b:'Centro',z:'CE',t:['arq','mem'],acc:1,dur:60,o:{s:[['09:00','19:00']]},x:'Visitas guiadas cada hora.'},
@@ -592,13 +606,13 @@ const D = [
 {n:'Museo Tammaro',b:'Ciudad Vieja',z:'CV',t:['arte'],dur:30,o:{s:[['10:30','19:00']],d:[['10:30','19:00']]},x:'Bronces, esculturas y música.'},
 {n:'Museo Torres García',b:'Ciudad Vieja',z:'CV',t:['ind','arte','fam'],dur:45,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},ev:{s:[['11:00',60,'Inauguración "Torres García y los pueblos indoamericanos" y monólogo de Gonzalo Figueiro'],['15:00',60,'Taller familiar de máscaras']],d:[['11:00',50,'Visita guiada por la colección permanente']]},x:'Nueva exposición sobre los pueblos indoamericanos.'},
 {n:'Palacio de Correos y Museo Postal',b:'Ciudad Vieja',z:'CV',t:['arq','ofi'],acc:1,dur:40,o:{s:[['10:00','19:00']],d:[['10:00','19:00']]},x:'Exposición filatélica y edificio histórico.'},
-{n:'Patio Mainumby',b:'Ciudad Vieja',z:'CV',t:['ind','fam','cien'],acc:1,dur:45,o:{s:[['11:00','16:00']]},ev:{s:[['11:00',45,'Walking tour patrimonial'],['12:00',45,'Walking tour patrimonial'],['13:00',45,'Walking tour patrimonial']]},x:'Jardín nativo, fotopaseo sobre raíces indígenas con el Archivo de la Memoria Charrúa y espacio para primera infancia.'},
-{n:'Ómnibus históricos de CUTCSA (Plaza Matriz)',b:'Ciudad Vieja',z:'CV',t:['ofi','fam'],dur:20,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Coches museo frente a la Catedral.'},
+{n:'Patio Mainumby',out:1,b:'Ciudad Vieja',z:'CV',t:['ind','fam','cien'],acc:1,dur:45,o:{s:[['11:00','16:00']]},ev:{s:[['11:00',45,'Walking tour patrimonial'],['12:00',45,'Walking tour patrimonial'],['13:00',45,'Walking tour patrimonial']]},x:'Jardín nativo, fotopaseo sobre raíces indígenas con el Archivo de la Memoria Charrúa y espacio para primera infancia.'},
+{n:'Ómnibus históricos de CUTCSA (Plaza Matriz)',out:1,b:'Ciudad Vieja',z:'CV',t:['ofi','fam'],dur:20,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Coches museo frente a la Catedral.'},
 {n:'Comisión del Patrimonio (Casa de Oribe)',b:'Ciudad Vieja',z:'CV',t:['ind','arq','cien'],dur:30,o:{s:[['10:00','17:00']],d:[['10:00','17:00']]},x:'Presentación del Departamento de Arqueología. Planta alta por escalera.'},
-{n:'Susurrando Memoria (Guardería Andresito)',b:'Ciudad Vieja',z:'CV',t:['mem','arte'],dur:30,o:{d:[['17:00','19:00']]},x:'Intervención callejera con susurradores de poesía.'},
-{n:'Bodegas Ángel Fallabrino',b:'Colón',z:'RU',t:['gas','ind'],dur:75,o:{s:[['10:00','17:00']],d:[['10:00','17:00']]},x:'Recorridas cada 20 minutos por cavas y museo, degustación, feria y ritual de la semilla nativa.'},
-{n:'Bodegas Carrau',b:'Colón',z:'RU',t:['gas','mus','fam','ind'],acc:1,dur:90,o:{s:[['10:00','17:30']],d:[['10:00','17:30']]},ev:{s:[['13:00',120,'Juegos de campo para niños']]},x:'Visitas a la cava, degustación, danzas, tango y plaza de comidas.'},
-{n:'Castillo Idiarte Borda',b:'Colón',z:'RU',t:['arq','fam'],acc:1,dur:75,o:{s:[['12:00','18:00']],d:[['11:00','18:00']]},x:'Visitas guiadas con número y horario asignado (retiralo al llegar), jardines, feria y plaza de comidas.'},
+{n:'Susurrando Memoria (Guardería Andresito)',out:1,b:'Ciudad Vieja',z:'CV',t:['mem','arte'],dur:30,o:{d:[['17:00','19:00']]},x:'Intervención callejera con susurradores de poesía.'},
+{n:'Bodegas Ángel Fallabrino',out:2,b:'Colón',z:'RU',t:['gas','ind'],dur:75,o:{s:[['10:00','17:00']],d:[['10:00','17:00']]},x:'Recorridas cada 20 minutos por cavas y museo, degustación, feria y ritual de la semilla nativa.'},
+{n:'Bodegas Carrau',out:2,b:'Colón',z:'RU',t:['gas','mus','fam','ind'],acc:1,dur:90,o:{s:[['10:00','17:30']],d:[['10:00','17:30']]},ev:{s:[['13:00',120,'Juegos de campo para niños']]},x:'Visitas a la cava, degustación, danzas, tango y plaza de comidas.'},
+{n:'Castillo Idiarte Borda',out:2,b:'Colón',z:'RU',t:['arq','fam'],acc:1,dur:75,o:{s:[['12:00','18:00']],d:[['11:00','18:00']]},x:'Visitas guiadas con número y horario asignado (retiralo al llegar), jardines, feria y plaza de comidas.'},
 {n:'Colegio Pío',b:'Colón',z:'RU',t:['cien','mem'],dur:50,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Museo de Ciencias Naturales, museo histórico y primer observatorio meteorológico del país.'},
 {n:'Asociación Calabresa',b:'Cordón',z:'CE',t:['col'],dur:45,o:{d:[['11:00','16:00']]},x:'Inmigración italiana, audiovisuales y radio en vivo.'},
 {n:'Biblioteca Central de Secundaria',b:'Cordón',z:'CE',t:['arte','ind'],dur:30,o:{s:[['12:00','17:00']]},x:'Exposiciones de Jorge di Pólito Hansen y Azul Rimoldi.'},
@@ -608,31 +622,31 @@ const D = [
 {n:'Museo de Historia Natural Torres de la Llosa',b:'Cordón',z:'CE',t:['cien','fam'],dur:45,o:{s:[['13:00','18:00']]},x:'Colección zoológica y paleontológica con actividades familiares.'},
 {n:'Sitio de memoria ex SID (INDDHH)',b:'Cordón',z:'CE',t:['mem','ind'],acc:1,dur:45,o:{s:[['10:30','14:30']],d:[['10:30','14:30']]},x:'Recorrida y audiovisual sobre la comunidad chaná (Timi-ju).'},
 {n:'Tercera Iglesia de Cristo, Científico',b:'Cordón',z:'CE',t:['arq'],dur:25,o:{d:[['12:00','16:00']]},x:'Vitraux y arquitectura; Monumento Histórico Nacional.'},
-{n:'Ruta del Jacinto (caminata)',b:'Jacinto Vera',z:'NO',t:['mem'],res:1,dur:90,ev:{s:[['10:30',90,'Caminata cultural guiada'],['14:30',90,'Caminata cultural guiada']]},x:'Recorrido por lugares icónicos del barrio.',r:'Inscripción al 092 010 787 (cupos limitados)'},
+{n:'Ruta del Jacinto (caminata)',out:1,b:'Jacinto Vera',z:'NO',t:['mem'],res:1,dur:90,ev:{s:[['10:30',90,'Caminata cultural guiada'],['14:30',90,'Caminata cultural guiada']]},x:'Recorrido por lugares icónicos del barrio.',r:'Inscripción al 092 010 787 (cupos limitados)'},
 {n:'Casa de la Memoria Ciudadana',b:'La Blanqueada',z:'ES',t:['mem'],acc:1,dur:45,o:{s:[['10:00','17:00']]},ev:{s:[['13:00',45,'Audiovisuales Memorias Travestis y Afrogama'],['15:00',45,'Audiovisuales Memorias Travestis y Afrogama']]},x:'Exposición de imágenes y talleres participativos.'},
 {n:'Instituto Geográfico Militar',b:'La Blanqueada',z:'ES',t:['cien','arq'],dur:45,o:{s:[['10:00','16:00']],d:[['10:00','16:00']]},x:'Arquitectura del edificio y museo de límites Uruguay–Brasil.'},
-{n:'La Blanqueada: la huella oculta (caminata)',b:'La Blanqueada',z:'ES',t:['mem','arq'],dur:120,ev:{s:[['11:00',120,'Caminata desde el Concejo Vecinal 4 (Av. Centenario 2878)']]},x:'Instituto Crandon, Universidad Católica e Iglesia Tierra Santa, entre otros.'},
-{n:'Caminatour de La Mondiola',b:'La Mondiola',z:'ES',t:['ind','mem','mus'],dur:180,ev:{s:[['10:00',180,'Caminata desde las Letras de Montevideo (Rambla República del Perú)']],d:[['10:00',180,'Caminata desde las Letras de Montevideo (Rambla República del Perú)']]},x:'El barrio donde se crearon los monumentos a Los Últimos Charrúas, Abayubá y Zapicán; historias de tango.'},
-{n:'Sitio de Memoria La Tablada',b:'La Tablada',z:'RU',t:['mem','fam'],acc:1,dur:60,o:{s:[['11:00','14:00']],d:[['11:00','14:00']]},ev:{s:[['15:00',60,'Taller para niñeces']],d:[['15:00',60,'Taller para niñeces']]},x:'Visita guiada.'},
-{n:'Circuito de Memoria del Municipio A (en ómnibus)',b:'La Teja',z:'OE',t:['mem'],dur:180,ev:{d:[['10:30',180,'Recorrido en ómnibus con testimoniantes desde la Federación del Vidrio']]},x:'Refinería de La Teja, FOICA, ex Ateneo Cerro-Teja y Memorial de los Desaparecidos.'},
+{n:'La Blanqueada: la huella oculta (caminata)',out:1,b:'La Blanqueada',z:'ES',t:['mem','arq'],dur:120,ev:{s:[['11:00',120,'Caminata desde el Concejo Vecinal 4 (Av. Centenario 2878)']]},x:'Instituto Crandon, Universidad Católica e Iglesia Tierra Santa, entre otros.'},
+{n:'Caminatour de La Mondiola',out:1,b:'La Mondiola',z:'ES',t:['ind','mem','mus'],dur:180,ev:{s:[['10:00',180,'Caminata desde las Letras de Montevideo (Rambla República del Perú)']],d:[['10:00',180,'Caminata desde las Letras de Montevideo (Rambla República del Perú)']]},x:'El barrio donde se crearon los monumentos a Los Últimos Charrúas, Abayubá y Zapicán; historias de tango.'},
+{n:'Sitio de Memoria La Tablada',out:2,b:'La Tablada',z:'RU',t:['mem','fam'],acc:1,dur:60,o:{s:[['11:00','14:00']],d:[['11:00','14:00']]},ev:{s:[['15:00',60,'Taller para niñeces']],d:[['15:00',60,'Taller para niñeces']]},x:'Visita guiada.'},
+{n:'Circuito de Memoria del Municipio A (en ómnibus)',out:2,b:'La Teja',z:'OE',t:['mem'],dur:180,ev:{d:[['10:30',180,'Recorrido en ómnibus con testimoniantes desde la Federación del Vidrio']]},x:'Refinería de La Teja, FOICA, ex Ateneo Cerro-Teja y Memorial de los Desaparecidos.'},
 {n:'Comisión Fomento Larrañaga: indios en un país "sin indios"',b:'Larrañaga',z:'NO',t:['ind','cien','mus'],acc:1,dur:150,ev:{s:[['14:00',150,'Exposición de Mónica Sans, fotos de flora y aves nativas y música en vivo']]},x:'Diálogo sobre la huella indígena en la población.'},
 {n:'Museo de la Memoria (MUME)',b:'Lavalleja',z:'NO',t:['mem'],acc:1,dur:60,o:{s:[['12:00','18:30']],d:[['12:00','18:30']]},x:'Exposición sobre el Plan Cóndor y mesa del Sitio de Memoria 300 Carlos.'},
-{n:'Ecoparque Idea Vilariño',b:'Malvín Norte',z:'ES',t:['mem','cien'],dur:45,o:{s:[['14:30','16:30']]},x:'Muestra de historia y memoria, fotos y recorrida.'},
+{n:'Ecoparque Idea Vilariño',out:1,b:'Malvín Norte',z:'ES',t:['mem','cien'],dur:45,o:{s:[['14:30','16:30']]},x:'Muestra de historia y memoria, fotos y recorrida.'},
 {n:'Institut Pasteur: viaje al pasado por la genómica',b:'Malvín Norte',z:'ES',t:['cien','ind'],dur:40,o:{s:[['10:00','15:00']]},x:'Visitas de 30 minutos cada 20, guiadas por científicos, sobre la ancestría de la población uruguaya. Sin inscripción.'},
 {n:'Escuela Experimental de Malvín',b:'Malvín',z:'ES',t:['arq'],dur:40,o:{s:[['10:00','16:00']]},x:'Obra del arquitecto Juan Antonio Scasso. (Conferencia arqueológica el viernes 2 a las 20 h.)'},
-{n:'Molino de Pérez y Parque Baroffio',b:'Malvín',z:'ES',t:['ind','fam','arq'],dur:60,o:{s:[['11:00','19:00']]},x:'Visitas al molino, charlas sobre indígenas, actividades infantiles y circo.'},
+{n:'Molino de Pérez y Parque Baroffio',out:2,b:'Malvín',z:'ES',t:['ind','fam','arq'],dur:60,o:{s:[['11:00','19:00']]},x:'Visitas al molino, charlas sobre indígenas, actividades infantiles y circo.'},
 {n:'Villa Yerúa: Museo del Tango y el Turf',b:'Malvín',z:'ES',t:['mus','ind'],acc:1,dur:50,o:{s:[['11:00','17:30']]},ev:{s:[['13:00',60,'Conversatorio sobre raíces indígenas con Alicia Fernández']]},x:'Museo y espectáculos musicales.'},
 {n:'Casa de Arte Taller Crecer',b:'Manga',z:'RU',t:['arte','ind'],dur:50,o:{s:[['13:00','18:00']]},x:'Cerámica: modelado, torno, horno alternativo y sellos ancestrales.'},
 {n:'MiMuseo CUTCSA',b:'Maroñas',z:'RU',t:['ofi','fam'],dur:50,o:{s:[['10:00','14:00']]},x:'Historia del transporte en Montevideo. Ómnibus gratis desde el Intercambiador Belloni cada hora de 10 a 13 h.'},
-{n:'Almacén Cavalieri',b:'Melilla',z:'RU',t:['gas','mus'],dur:90,o:{s:[['11:00','19:00']],d:[['11:00','19:00']]},x:'Antigüedades, asado con cuero y folclore.'},
+{n:'Almacén Cavalieri',out:2,b:'Melilla',z:'RU',t:['gas','mus'],dur:90,o:{s:[['11:00','19:00']],d:[['11:00','19:00']]},x:'Antigüedades, asado con cuero y folclore.'},
 {n:'Bodega Beretta: uvas en épocas indígenas',b:'Melilla',z:'RU',t:['gas','ind'],res:1,dur:90,ev:{s:[['10:30',90,'Recorrida, charla y cata'],['15:30',90,'Recorrida, charla y cata']],d:[['10:30',90,'Recorrida, charla y cata'],['15:30',90,'Recorrida, charla y cata']]},x:'Charla sobre la uva en 1516.',r:'Reserva por WhatsApp 091 215 737'},
-{n:'Ecoturismo Sacu',b:'Melilla',z:'RU',t:['cien','mem'],dur:60,o:{s:[['10:00','16:00']],d:[['10:00','16:00']]},ev:{s:[['11:00',60,'Sendero interpretativo'],['14:00',60,'Sendero interpretativo']],d:[['11:00',60,'Sendero interpretativo'],['14:00',60,'Sendero interpretativo']]},x:'Objetos antiguos del agro y senderos.'},
-{n:'Estancia Taranco',b:'Melilla',z:'RU',t:['fam','gas','mem'],dur:90,o:{s:[['11:00','18:30']],d:[['11:00','18:30']]},x:'Casco histórico, museo, paseos a caballo y plaza de comidas.'},
-{n:'Circuito de Memoria del Municipio E (en ómnibus)',b:'Portones',z:'CA',t:['mem'],dur:120,ev:{d:[['10:30',120,'Recorrido en ómnibus desde la terminal Portones']]},x:'Casa de Punta Gorda, ex Fábrica del Vidrio y sitio Álvarez Cortés.'},
-{n:'Sede central de UTU',b:'Palermo',z:'CE',t:['arte','mus','ind','mem'],acc:1,dur:60,o:{s:[['09:00','18:00']]},ev:{s:[['11:00',60,'Taller de acuarelas con tintes ancestrales'],['10:00',75,'Caminatour por Barrio Sur guiado por estudiantes'],['12:00',75,'Caminatour por Barrio Sur'],['14:00',75,'Caminatour por Barrio Sur'],['16:00',60,'Rock y poesía: Música para búhos']]},x:'Museo interactivo de la educación técnica, muestras fotográficas y orquesta.'},
+{n:'Ecoturismo Sacu',out:1,b:'Melilla',z:'RU',t:['cien','mem'],dur:60,o:{s:[['10:00','16:00']],d:[['10:00','16:00']]},ev:{s:[['11:00',60,'Sendero interpretativo'],['14:00',60,'Sendero interpretativo']],d:[['11:00',60,'Sendero interpretativo'],['14:00',60,'Sendero interpretativo']]},x:'Objetos antiguos del agro y senderos.'},
+{n:'Estancia Taranco',out:2,b:'Melilla',z:'RU',t:['fam','gas','mem'],dur:90,o:{s:[['11:00','18:30']],d:[['11:00','18:30']]},x:'Casco histórico, museo, paseos a caballo y plaza de comidas.'},
+{n:'Circuito de Memoria del Municipio E (en ómnibus)',out:2,b:'Portones',z:'CA',t:['mem'],dur:120,ev:{d:[['10:30',120,'Recorrido en ómnibus desde la terminal Portones']]},x:'Casa de Punta Gorda, ex Fábrica del Vidrio y sitio Álvarez Cortés.'},
+{n:'Sede central de UTU',out:2,b:'Palermo',z:'CE',t:['arte','mus','ind','mem'],acc:1,dur:60,o:{s:[['09:00','18:00']]},ev:{s:[['11:00',60,'Taller de acuarelas con tintes ancestrales'],['10:00',75,'Caminatour por Barrio Sur guiado por estudiantes'],['12:00',75,'Caminatour por Barrio Sur'],['14:00',75,'Caminatour por Barrio Sur'],['16:00',60,'Rock y poesía: Música para búhos']]},x:'Museo interactivo de la educación técnica, muestras fotográficas y orquesta.'},
 {n:'Hospital de Clínicas: sitio de memoria',b:'Parque Batlle',z:'ES',t:['mem'],acc:1,dur:50,ev:{s:[['16:00',50,'Apertura musical y presentación audiovisual']]},x:'El hospital como sitio de memoria del pasado reciente.'},
-{n:'Instituto de Higiene',b:'Parque Batlle',z:'ES',t:['cien','fam'],dur:50,o:{s:[['11:00','18:00']]},x:'Jardín de plantas nativas, stands y un laboratorio antiguo recreado para fotos.'},
-{n:'Residencia Británica y sus jardines',b:'Parque Batlle',z:'ES',t:['arq','col','cien'],acc:1,dur:60,o:{s:[['10:00','16:00']]},x:'Casa de 1928, jardines guiados por su jardinero, música y autos clásicos británicos.'},
+{n:'Instituto de Higiene',out:2,b:'Parque Batlle',z:'ES',t:['cien','fam'],dur:50,o:{s:[['11:00','18:00']]},x:'Jardín de plantas nativas, stands y un laboratorio antiguo recreado para fotos.'},
+{n:'Residencia Británica y sus jardines',out:2,b:'Parque Batlle',z:'ES',t:['arq','col','cien'],acc:1,dur:60,o:{s:[['10:00','16:00']]},x:'Casa de 1928, jardines guiados por su jardinero, música y autos clásicos británicos.'},
 {n:'Residencia del Embajador de EE.UU.',b:'Parque Batlle',z:'ES',t:['arq','col'],acc:1,res:1,dur:60,o:{s:[['11:00','14:30']]},x:'Visitas guiadas por la residencia y exhibición por los 250 años de la independencia de Estados Unidos.',r:'Reserva obligatoria en el formulario de la Embajada (link en la guía oficial); presentar el correo de confirmación'},
 {n:'Ministerio de Defensa Nacional (Edificio Gral. Artigas)',b:'Parque Batlle',z:'ES',t:['mem','mus'],dur:50,o:{s:[['10:00','17:00']],d:[['10:00','17:00']]},ev:{s:[['11:00',60,'Concierto de bandas militares y exhibición de escuelas militares'],['15:00',60,'Concierto de bandas militares y exhibición de escuelas militares']],d:[['11:00',60,'Concierto de bandas militares y exhibición de escuelas militares'],['15:00',60,'Concierto de bandas militares y exhibición de escuelas militares']]},x:'Acceso al público a la sede del ministerio.'},
 {n:'Centro Cultural Soka Gakkai',b:'Parque Batlle',z:'ES',t:['arq'],dur:45,o:{s:[['15:00','19:00']]},x:'Recorrido a tu ritmo con guías, exposiciones y videos sobre el budismo Soka y la cultura de paz.'},
@@ -641,15 +655,15 @@ const D = [
 {n:'Estudio Arq. Diego Neri (Residencia Zúñiga)',b:'Parque Rodó',z:'CE',t:['arq'],dur:50,o:{s:[['10:00','16:00']]},x:'Demostraciones y charlas sobre restauración patrimonial, ornamentos, vitrales y oficios tradicionales.'},
 {n:'FADU (Facultad de Arquitectura)',b:'Parque Rodó',z:'CE',t:['arq','arte'],acc:1,dur:60,o:{s:[['08:00','20:00']],d:[['08:00','20:00']]},x:'Exposiciones y actividades; cronograma en el sitio de la FADU.'},
 {n:'Museo Casa Vilamajó',b:'Parque Rodó',z:'CE',t:['arq'],dur:30,ev:{s:[['11:00',30,'Visita mediada'],['11:30',30,'Visita mediada'],['12:00',30,'Visita mediada'],['12:30',30,'Visita mediada'],['16:30',30,'Última visita mediada']]},x:'La casa del arquitecto Julio Vilamajó.'},
-{n:'Parque Tomkinson',b:'Paso de la Arena',z:'OE',t:['cien','mem','fam'],acc:1,dur:60,o:{s:[['14:00','17:00']]},ev:{s:[['15:00',30,'Crónicas de Tomkinson: historia del parque en canción y relato']]},x:'Festejo comunitario de la primavera.'},
+{n:'Parque Tomkinson',out:1,b:'Paso de la Arena',z:'OE',t:['cien','mem','fam'],acc:1,dur:60,o:{s:[['14:00','17:00']]},ev:{s:[['15:00',30,'Crónicas de Tomkinson: historia del parque en canción y relato']]},x:'Festejo comunitario de la primavera.'},
 {n:'Museo Nacional de Antropología',b:'Paso de las Duranas',z:'NO',t:['ind','cien'],dur:75,o:{s:[['12:00','18:00']],d:[['12:00','18:00']]},ev:{s:[['13:00',60,'Navegación indígena: charlas y demostración con réplicas de canoas monóxilas']],d:[['13:00',60,'Navegación indígena: charlas y demostración con réplicas de canoas monóxilas'],['14:00',150,'Ceremonias de Tapari Ukaiuguat (la guía indica 14 h en una entrada y 14:30 en otra)']]},x:'Visita guiada y dos nuevas exposiciones.'},
-{n:'Plaza Segunda República Española: Territorio Cuatro Caminos',b:'Paso de las Duranas',z:'NO',t:['arte','ind'],acc:1,dur:30,o:{s:[['13:00','17:00']],d:[['13:00','17:00']]},x:'Exposición fotográfica al aire libre.'},
+{n:'Plaza Segunda República Española: Territorio Cuatro Caminos',out:1,b:'Paso de las Duranas',z:'NO',t:['arte','ind'],acc:1,dur:30,o:{s:[['13:00','17:00']],d:[['13:00','17:00']]},x:'Exposición fotográfica al aire libre.'},
 {n:'Museo Paso de las Duranas',b:'Paso de las Duranas',z:'NO',t:['mem','ind','fam'],dur:45,o:{s:[['11:00','20:00']]},x:'Historia del Prado, figuritas e historietas, objetos indígenas y los nombres indígenas de sus calles.'},
-{n:'Círculo de Estudios Ferroviarios',b:'Peñarol',z:'NO',t:['ofi','fam'],acc:1,dur:60,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Locomotoras y vagones históricos y Museo Ferroviario.'},
+{n:'Círculo de Estudios Ferroviarios',out:2,b:'Peñarol',z:'NO',t:['ofi','fam'],acc:1,dur:60,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Locomotoras y vagones históricos y Museo Ferroviario.'},
 {n:'Taller Ferroviario (SLF)',b:'Peñarol',z:'NO',t:['ofi'],dur:45,o:{s:[['10:00','17:00']],d:[['10:00','17:00']]},x:'Recorrido por las instalaciones del taller. Cuenta con rampa.'},
 {n:'Biblioteca Batlle',b:'Piedras Blancas',z:'RU',t:['mem','mus'],acc:1,dur:45,o:{s:[['09:00','18:00']]},ev:{s:[['10:00',60,'Charla con docente y estudiantes'],['15:30',60,'Orquesta Juvenil del Sodre']]},x:'Recorrido por la biblioteca y muestra "Luces y Pozos".'},
-{n:'Casaquinta de José Batlle y Ordóñez',b:'Piedras Blancas',z:'RU',t:['mem','arq','ind'],acc:1,dur:60,o:{s:[['11:00','17:00']],d:[['11:00','17:00']]},ev:{s:[['10:30',90,'Caminatour por Piedras Blancas desde la Biblioteca Batlle (Belloni 4370)'],['13:30',30,'Intervención artística "Indígenas del siglo XIX"'],['14:00',45,'Visita comentada a la vivienda y el jardín'],['15:30',45,'Visita comentada a la vivienda y el jardín']],d:[['14:00',45,'Visita comentada a la vivienda y el jardín'],['15:30',45,'Visita comentada a la vivienda y el jardín']]},x:'Casa, jardín y fotogalería de la familia Batlle Pacheco.'},
-{n:'Casa Towers (Residencia de la Embajada de Italia)',b:'Pocitos',z:'ES',t:['arq','col'],dur:45,o:{s:[['10:00','16:00']]},x:'Casa de estilo francés de 1910, jardines, obras de arte y mobiliario. Grupos limitados sin inscripción.'},
+{n:'Casaquinta de José Batlle y Ordóñez',out:2,b:'Piedras Blancas',z:'RU',t:['mem','arq','ind'],acc:1,dur:60,o:{s:[['11:00','17:00']],d:[['11:00','17:00']]},ev:{s:[['10:30',90,'Caminatour por Piedras Blancas desde la Biblioteca Batlle (Belloni 4370)'],['13:30',30,'Intervención artística "Indígenas del siglo XIX"'],['14:00',45,'Visita comentada a la vivienda y el jardín'],['15:30',45,'Visita comentada a la vivienda y el jardín']],d:[['14:00',45,'Visita comentada a la vivienda y el jardín'],['15:30',45,'Visita comentada a la vivienda y el jardín']]},x:'Casa, jardín y fotogalería de la familia Batlle Pacheco.'},
+{n:'Casa Towers (Residencia de la Embajada de Italia)',out:2,b:'Pocitos',z:'ES',t:['arq','col'],dur:45,o:{s:[['10:00','16:00']]},x:'Casa de estilo francés de 1910, jardines, obras de arte y mobiliario. Grupos limitados sin inscripción.'},
 {n:'Embajada de Colombia',b:'Pocitos',z:'ES',t:['col','arte'],acc:1,dur:45,o:{s:[['10:00','16:00']]},ev:{s:[['13:00',120,'Charla sobre salud y migración'],['15:00',60,'Charla sobre el patrimonio de la Embajada']]},x:'Casa patrimonial abierta, exposición plástica en la cava y espacio para infancias.'},
 {n:'Embajada de España',b:'Pocitos',z:'ES',t:['arq','col'],acc:1,dur:40,o:{s:[['10:00','16:00']]},x:'Visita a la residencia de la Embajada.'},
 {n:'Embajada de Panamá: Panamá ancestral',b:'Pocitos',z:'ES',t:['ind','col','fam'],acc:1,dur:60,o:{s:[['10:00','18:00']]},ev:{s:[['11:00',45,'Taller infantil de pintura rupestre'],['12:00',45,'Visita guiada: pueblos indígenas de Panamá'],['13:00',45,'Taller infantil de pintura rupestre y visita guiada'],['14:45',45,'Presentaciones sobre la localidad rupestre de Chamangá'],['16:00',45,'Conversatorio sobre pueblos indígenas de Panamá'],['17:00',45,'Ballet Juvenil del Sodre']]},x:'Exposición por pueblos originarios con fotos, videos y trajes tradicionales.'},
@@ -659,43 +673,43 @@ const D = [
 {n:'Radio Club Uruguayo',b:'Pocitos',z:'ES',t:['ofi','mem'],dur:30,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Equipos de comunicación históricos del club fundado en 1933.'},
 {n:'Museo y Archivo Tranviario Uruguayo',b:'Porvenir',z:'NO',t:['ofi'],dur:40,o:{s:[['10:00','18:00']]},x:'Muestra guiada. Acceso solo por escalera (segundo piso).'},
 {n:'Círculo Trentino de Montevideo',b:'Prado',z:'NO',t:['col','ind','mus'],acc:1,dur:45,o:{s:[['12:30','16:30']]},ev:{s:[['11:15',30,'Charla: Edmundo Prati y el monumento Los Últimos Charrúas'],['11:45',30,'Coro Stella Alpina'],['12:15',20,'Baile Passi del Trentino']]},x:'Recorrido por las instalaciones.'},
-{n:'Casa de Cultura del Prado',b:'Prado',z:'NO',t:['arte','fam'],dur:50,o:{s:[['13:00','18:00']]},x:'Feria de artes y artesanías y recorridos gratuitos en ómnibus por el barrio.'},
-{n:'Casa Quinta Storace',b:'Prado',z:'NO',t:['arq','fam','arte'],dur:45,o:{s:[['13:00','17:00']],d:[['13:00','17:00']]},x:'Quinta del siglo XIX restaurada, jardín, juegos infantiles y restauración de esculturas en vivo.'},
+{n:'Casa de Cultura del Prado',out:2,b:'Prado',z:'NO',t:['arte','fam'],dur:50,o:{s:[['13:00','18:00']]},x:'Feria de artes y artesanías y recorridos gratuitos en ómnibus por el barrio.'},
+{n:'Casa Quinta Storace',out:2,b:'Prado',z:'NO',t:['arq','fam','arte'],dur:45,o:{s:[['13:00','17:00']],d:[['13:00','17:00']]},x:'Quinta del siglo XIX restaurada, jardín, juegos infantiles y restauración de esculturas en vivo.'},
 {n:'Castillo Soneira',b:'Prado',z:'NO',t:['arq'],acc:1,dur:45,o:{s:[['14:00','17:00']]},x:'Recorridos grupales guiados por las instalaciones y la restauración.'},
 {n:'Colectividad Helénica',b:'Prado',z:'NO',t:['col','gas','mus'],dur:60,ev:{s:[['11:00',60,'Lectura de la borra del café']],d:[['15:00',60,'Coros Before Oldies y Alma Mater Crandon'],['16:00',60,'Grupo Rebétika Montevideo']]},x:'Comidas típicas, artesanías griegas y visitas a la Iglesia Ortodoxa San Nicolás (horario general no indicado).'},
 {n:'DAECPU: Nuestras Raíces',b:'Prado',z:'NO',t:['mus','mem'],dur:45,o:{s:[['12:00','16:00']],d:[['12:00','16:00']]},x:'Exposiciones y Centro de Interpretación del Carnaval; planta baja accesible.'},
 {n:'Museo Juan Manuel Blanes',b:'Prado',z:'NO',t:['arte','arq'],dur:60,o:{s:[['11:00','18:00']],d:[['11:00','18:00']]},ev:{s:[['16:00',40,'Coro del CCE']],d:[['16:00',40,'Coro Arsis']]},x:'Figari y Blanes, más muestras de Charbonnier, Mortarotti, Blanes Viale y Germán Cabrera.'},
-{n:'Escuela de Jardinería: flora indígena',b:'Prado',z:'NO',t:['cien','ind'],dur:60,o:{s:[['13:30','17:30']]},ev:{s:[['14:30',120,'Charla y recorrido a pie hasta el monumento Los Últimos Charrúas']]},x:'Flora indígena en espacios públicos. Se suspende por mal tiempo.'},
+{n:'Escuela de Jardinería: flora indígena',out:1,b:'Prado',z:'NO',t:['cien','ind'],dur:60,o:{s:[['13:30','17:30']]},ev:{s:[['14:30',120,'Charla y recorrido a pie hasta el monumento Los Últimos Charrúas']]},x:'Flora indígena en espacios públicos. Se suspende por mal tiempo.'},
 {n:'Iglesia Luterana San Pablo',b:'Prado',z:'NO',t:['arq','mus'],acc:1,dur:45,ev:{d:[['10:30',60,'Culto sobre las raíces de la comunidad'],['12:00',60,'Imágenes de la Reforma y visita al Colegio San Pablo'],['17:30',45,'Maitines y canto gregoriano']]},x:'Raíces de la comunidad luterana.'},
-{n:'Parque Prado: Tu Escultura (Los Últimos Charrúas)',b:'Prado',z:'NO',t:['ind','arte','fam'],dur:60,o:{s:[['13:00','17:00']],d:[['13:00','17:00']]},x:'Estaciones de monocopia, sellos y dibujo para infancias junto al monumento.'},
+{n:'Parque Prado: Tu Escultura (Los Últimos Charrúas)',out:1,b:'Prado',z:'NO',t:['ind','arte','fam'],dur:60,o:{s:[['13:00','17:00']],d:[['13:00','17:00']]},x:'Estaciones de monocopia, sellos y dibujo para infancias junto al monumento.'},
 {n:'Parroquia Armenia Nuestra Señora de Bzommar',b:'Prado',z:'NO',t:['col','arq','mus'],dur:40,o:{s:[['09:00','15:30']]},x:'Templo, casa parroquial de 1912, museo, danza y coro.'},
 {n:'Iglesia Carmelitas (templo neogótico)',b:'Prado',z:'NO',t:['arq'],acc:1,dur:40,o:{d:[['10:00','15:00']]},x:'Recorrido libre y piezas del proceso de restauración.',r:'Recorridos guiados (12 a 15 h) con inscripción previa en las redes del Estudio Diego Neri'},
-{n:'Residencia Presidencial del Prado',b:'Prado',z:'NO',t:['arq','mem'],dur:50,o:{s:[['10:00','17:00']]},x:'Visitas guiadas en grupos por salas protocolares y jardines.'},
+{n:'Residencia Presidencial del Prado',out:2,b:'Prado',z:'NO',t:['arq','mem'],dur:50,o:{s:[['10:00','17:00']]},x:'Visitas guiadas en grupos por salas protocolares y jardines.'},
 {n:'Casa Polaca',b:'Prado',z:'NO',t:['col','gas'],dur:50,o:{d:[['10:00','18:00']]},x:'Exposición sobre la inmigración polaca y platos típicos.'},
-{n:'Club River Plate: Museo Darsenero',b:'Prado',z:'NO',t:['mem','fam'],dur:50,o:{d:[['09:00','17:00']]},x:'Museo, Quinta del Buen Retiro y field del club.'},
-{n:'Liceo Militar General Artigas',b:'Prado',z:'NO',t:['fam','mem'],dur:75,o:{s:[['09:00','12:00'],['14:00','17:00']],d:[['09:00','12:00'],['14:00','17:00']]},x:'"Alumno por un día": clases, laboratorios, pista y recorridas guiadas por estudiantes.'},
+{n:'Club River Plate: Museo Darsenero',out:2,b:'Prado',z:'NO',t:['mem','fam'],dur:50,o:{d:[['09:00','17:00']]},x:'Museo, Quinta del Buen Retiro y field del club.'},
+{n:'Liceo Militar General Artigas',out:2,b:'Prado',z:'NO',t:['fam','mem'],dur:75,o:{s:[['09:00','12:00'],['14:00','17:00']],d:[['09:00','12:00'],['14:00','17:00']]},x:'"Alumno por un día": clases, laboratorios, pista y recorridas guiadas por estudiantes.'},
 {n:'Museo de la Bicicleta',b:'Prado',z:'NO',t:['ofi','fam'],dur:40,ev:{s:[['17:00',40,'Visita guiada']],d:[['17:00',40,'Visita guiada']]},x:'Raíces en dos ruedas. Rampas portátiles.'},
 {n:'Café y Bar Tabaré',b:'Punta Carretas',z:'CE',t:['gas','mem'],dur:45,o:{s:[['12:00','18:00']],d:[['12:00','18:00']]},x:'Más de 100 años de historia del bar.'},
 {n:'Nueva Acrópolis: aportes indígenas',b:'Punta Carretas',z:'CE',t:['ind','arq'],dur:90,ev:{s:[['19:30',90,'Piezas, música, poesía y charla filosófica sobre aportes indígenas']]},x:'Escuela de filosofía.'},
-{n:'Faro de Punta Brava',b:'Punta Carretas',z:'CE',t:['arq','ofi','fam'],dur:40,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Recorrido por el faro histórico y su funcionamiento.'},
-{n:'Museo Zorrilla',b:'Punta Carretas',z:'CE',t:['arte','gas'],acc:1,dur:45,o:{s:[['11:00','16:00']],d:[['11:00','16:00']]},ev:{s:[['12:00',60,'Charla y cata del vino del taller del escultor'],['14:00',60,'Charla y cata del vino del taller del escultor']],d:[['12:00',60,'Recorrido mediado por el jardín'],['14:00',60,'Recorrido mediado por el jardín']]},x:'Casa y taller de José Luis Zorrilla de San Martín.',r:'Charlas y recorridos con inscripción: info@museozorrilla.gub.uy'},
+{n:'Faro de Punta Brava',out:2,b:'Punta Carretas',z:'CE',t:['arq','ofi','fam'],dur:40,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Recorrido por el faro histórico y su funcionamiento.'},
+{n:'Museo Zorrilla',out:2,b:'Punta Carretas',z:'CE',t:['arte','gas'],acc:1,dur:45,o:{s:[['11:00','16:00']],d:[['11:00','16:00']]},ev:{s:[['12:00',60,'Charla y cata del vino del taller del escultor'],['14:00',60,'Charla y cata del vino del taller del escultor']],d:[['12:00',60,'Recorrido mediado por el jardín'],['14:00',60,'Recorrido mediado por el jardín']]},x:'Casa y taller de José Luis Zorrilla de San Martín.',r:'Charlas y recorridos con inscripción: info@museozorrilla.gub.uy'},
 {n:'Parva Domus',b:'Punta Carretas',z:'CE',t:['ofi','arq','mus'],acc:1,dur:45,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},ev:{s:[['16:30',40,'Coro Sintonías']]},x:'Taxímetros, modelismo, filatelia y museo parvense.'},
-{n:'Sitios de memoria del Municipio CH',b:'Punta Carretas',z:'CE',t:['mem'],dur:120,o:{s:[['13:00','17:00']]},x:'Visitas a espacios de memoria del pasado reciente. Punto: José Ellauri 365.'},
-{n:'Sitio de Memoria Punta de Rieles',b:'Punta de Rieles',z:'RU',t:['mem','fam'],acc:1,dur:60,o:{s:[['11:00','14:00']]},ev:{s:[['11:30',60,'Visita guiada con ex presas']]},x:'Cinta memorial en mosaico y juegos de la memoria para infancias.'},
-{n:'MIVI Museo Interactivo Vitruvio',b:'Punta Espinillo',z:'OE',t:['cien','fam'],dur:60,ev:{s:[['10:00',60,'Recorrida por la figura humana y laberinto'],['11:30',45,'Charla de orígenes'],['13:30',60,'Recorrida por la figura humana y laberinto'],['15:00',45,'Charla de orígenes']]},x:'Museo interactivo en la Ruta del Espinillo.'},
-{n:'Ruta del Espinillo (en ómnibus)',b:'Paso de la Arena',z:'OE',t:['cien','fam','arte'],dur:240,ev:{s:[['10:00',240,'Circuito en ómnibus desde la Terminal Paso de la Arena (duración no indicada en la guía)']]},x:'Chacras de Rincón del Cerro, escuelas, MIVI, Complejo Rural Oeste y Parque Punta Espinillo.'},
+{n:'Sitios de memoria del Municipio CH',out:1,b:'Punta Carretas',z:'CE',t:['mem'],dur:120,o:{s:[['13:00','17:00']]},x:'Visitas a espacios de memoria del pasado reciente. Punto: José Ellauri 365.'},
+{n:'Sitio de Memoria Punta de Rieles',out:2,b:'Punta de Rieles',z:'RU',t:['mem','fam'],acc:1,dur:60,o:{s:[['11:00','14:00']]},ev:{s:[['11:30',60,'Visita guiada con ex presas']]},x:'Cinta memorial en mosaico y juegos de la memoria para infancias.'},
+{n:'MIVI Museo Interactivo Vitruvio',out:2,b:'Punta Espinillo',z:'OE',t:['cien','fam'],dur:60,ev:{s:[['10:00',60,'Recorrida por la figura humana y laberinto'],['11:30',45,'Charla de orígenes'],['13:30',60,'Recorrida por la figura humana y laberinto'],['15:00',45,'Charla de orígenes']]},x:'Museo interactivo en la Ruta del Espinillo.'},
+{n:'Ruta del Espinillo (en ómnibus)',out:2,b:'Paso de la Arena',z:'OE',t:['cien','fam','arte'],dur:240,ev:{s:[['10:00',240,'Circuito en ómnibus desde la Terminal Paso de la Arena (duración no indicada en la guía)']]},x:'Chacras de Rincón del Cerro, escuelas, MIVI, Complejo Rural Oeste y Parque Punta Espinillo.'},
 {n:'Colegio La Mennais',b:'Punta Gorda',z:'CA',t:['arq'],dur:45,ev:{s:[['10:30',45,'Visita guiada por estudiantes'],['12:00',45,'Visita guiada por estudiantes']]},x:'Arquitectura moderna de Serralt, Clémot y Dieste.'},
 {n:'Embajada de El Salvador: herencia maya',b:'Punta Gorda',z:'CA',t:['ind','col'],dur:40,o:{s:[['10:00','18:00']]},ev:{s:[['16:00',60,'Documental Cipactli sobre arte rupestre']]},x:'Exposición fotográfica sobre herencia cultural maya.'},
 {n:'Econo Rent a Car: autos de época',b:'Reducto',z:'NO',t:['ofi','arq'],dur:40,o:{s:[['11:00','18:00']],d:[['11:00','18:00']]},x:'Colección particular de autos deportivos, de rally y de pista, maquetas y motos.'},
 {n:'Hospital Vilardebó (Espacio patrimonial)',b:'Reducto',z:'NO',t:['mem','arq'],dur:45,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Visitas guiadas durante todo el horario.'},
-{n:'Ancestros de la Banda Oriental (colección particular)',b:'Reducto',z:'NO',t:['arte','ind','arq'],dur:30,o:{s:[['10:00','19:00']],d:[['10:00','19:00']]},x:'Pirograbados de gran formato al aire libre, de Martín Núñez.'},
-{n:'Humedales de Santa Lucía: caminata',b:'Rincón de Melilla',z:'RU',t:['ind','cien'],dur:120,ev:{s:[['10:30',120,'Caminata con el Clan Choñik por humedales y monte nativo']]},x:'Encuentro desde el Centro de Interpretación (La Guardia 19).'},
-{n:'Sendero Eco-arqueológico Mainumby',b:'Rincón de Melilla',z:'RU',t:['ind','cien'],res:1,dur:90,ev:{s:[['12:00',90,'Visita guiada'],['14:00',90,'Visita guiada'],['16:00',90,'Visita guiada']]},x:'Sendero de dificultad baja a media en el humedal del Santa Lucía.',r:'Inscripción hasta 48 h antes: cirat@dicyt.gub.uy'},
-{n:'Parque Público Punta Yeguas',b:'Santa Catalina',z:'OE',t:['cien'],dur:90,o:{s:[['08:00','10:00'],['14:00','16:00']],d:[['08:00','10:00'],['14:00','16:00']]},x:'Visita guiada, historia del parque y avistamiento de aves.'},
-{n:'Cooperativa Carpe Diem: ombú ancestral',b:'Santiago Vázquez',z:'OE',t:['ind','cien','fam'],dur:90,o:{s:[['10:00','19:00']]},x:'Monte de ombúes, ritual guaraní de siembra, plantas medicinales, vasijas de barro y fogón.'},
-{n:'Subprefectura de Santiago Vázquez',b:'Santiago Vázquez',z:'OE',t:['ofi','fam'],dur:30,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Exposición de móviles terrestres y acuáticos de la Armada.'},
+{n:'Ancestros de la Banda Oriental (colección particular)',out:1,b:'Reducto',z:'NO',t:['arte','ind','arq'],dur:30,o:{s:[['10:00','19:00']],d:[['10:00','19:00']]},x:'Pirograbados de gran formato al aire libre, de Martín Núñez.'},
+{n:'Humedales de Santa Lucía: caminata',out:1,b:'Rincón de Melilla',z:'RU',t:['ind','cien'],dur:120,ev:{s:[['10:30',120,'Caminata con el Clan Choñik por humedales y monte nativo']]},x:'Encuentro desde el Centro de Interpretación (La Guardia 19).'},
+{n:'Sendero Eco-arqueológico Mainumby',out:1,b:'Rincón de Melilla',z:'RU',t:['ind','cien'],res:1,dur:90,ev:{s:[['12:00',90,'Visita guiada'],['14:00',90,'Visita guiada'],['16:00',90,'Visita guiada']]},x:'Sendero de dificultad baja a media en el humedal del Santa Lucía.',r:'Inscripción hasta 48 h antes: cirat@dicyt.gub.uy'},
+{n:'Parque Público Punta Yeguas',out:1,b:'Santa Catalina',z:'OE',t:['cien'],dur:90,o:{s:[['08:00','10:00'],['14:00','16:00']],d:[['08:00','10:00'],['14:00','16:00']]},x:'Visita guiada, historia del parque y avistamiento de aves.'},
+{n:'Cooperativa Carpe Diem: ombú ancestral',out:1,b:'Santiago Vázquez',z:'OE',t:['ind','cien','fam'],dur:90,o:{s:[['10:00','19:00']]},x:'Monte de ombúes, ritual guaraní de siembra, plantas medicinales, vasijas de barro y fogón.'},
+{n:'Subprefectura de Santiago Vázquez',out:2,b:'Santiago Vázquez',z:'OE',t:['ofi','fam'],dur:30,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Exposición de móviles terrestres y acuáticos de la Armada.'},
 {n:'Biblioteca Eduardo Acevedo Díaz',b:'Sayago',z:'NO',t:['mem'],res:1,dur:60,ev:{s:[['11:00',60,'Visita guiada'],['12:30',60,'Visita guiada'],['14:00',90,'Juego "Contá Vos" sobre la memoria de los barrios']]},x:'Sin accesibilidad.',r:'Inscripción por WhatsApp al 098 241 040 hasta el viernes 2'},
-{n:'Tierra Arcoíris: Clan Choñik',b:'Toledo Chico',z:'RU',t:['ind','cien','gas'],dur:90,o:{s:[['10:30','19:00']]},ev:{s:[['10:30',60,'Ceremonia de apertura'],['14:00',60,'Reconocimiento de plantas en el monte nativo'],['16:00',60,'Actividad agroecológica'],['17:30',30,'Taller de lengua a través del canto'],['18:00',60,'Ceremonia del Fuego y el Bastón de la Palabra']]},x:'Hierbas medicinales y almuerzo de las mujeres indígenas.'},
+{n:'Tierra Arcoíris: Clan Choñik',out:1,b:'Toledo Chico',z:'RU',t:['ind','cien','gas'],dur:90,o:{s:[['10:30','19:00']]},ev:{s:[['10:30',60,'Ceremonia de apertura'],['14:00',60,'Reconocimiento de plantas en el monte nativo'],['16:00',60,'Actividad agroecológica'],['17:30',30,'Taller de lengua a través del canto'],['18:00',60,'Ceremonia del Fuego y el Bastón de la Palabra']]},x:'Hierbas medicinales y almuerzo de las mujeres indígenas.'},
 {n:'Casa Museo "Lo que el tiempo se llevó"',b:'Tres Cruces',z:'CE',t:['ofi','arq'],dur:30,o:{s:[['11:00','16:00']]},x:'Objetos de empresas uruguayas que ya no existen, cine, TV, radios y cámaras.'},
 {n:'Centro Nacional Armenio',b:'Tres Cruces',z:'CE',t:['col','gas','mus','fam'],dur:60,o:{s:[['11:00','19:00']]},ev:{s:[['16:00',60,'Conjuntos de folclore armenio y uruguayo'],['18:00',60,'Ensayo abierto del conjunto Gayané']]},x:'Muestra interactiva, cantina armenia y talleres para infancias (12 a 15 h).'},
 {n:'Gran Logia de la Masonería',b:'Tres Cruces',z:'CE',t:['arq'],dur:45,o:{s:[['10:00','17:00']]},x:'Visita patrimonial del edificio con guía de audio.'},
@@ -709,7 +723,9 @@ const D = [
 {n:'Modo Casona: exposición, open studios y coctelería',no:1,grp:'modo',b:'Ciudad Vieja',z:'CV',t:['arte','mus'],dur:45,o:{s:[['10:00','18:00']]},x:'Exposiciones, open studios, música en vivo y coctelería. Sarandí 544. Organiza: Modo Casona.'},
 {n:'Taller Alzáibar: Casa Abierta',no:1,grp:'alz',b:'Ciudad Vieja',z:'CV',t:['arte'],dur:40,o:{s:[['15:00','20:00']]},x:'Casa taller autogestionada donde artistas, talleristas y estudiantes comparten procesos y saberes. Alzáibar 1261. Organiza: Taller Alzáibar.'},
 {n:'Capilla Susana Soca',no:1,b:'Soca',z:'CN',t:['arq'],dur:45,o:{s:[['10:00','12:00']]},q:'Capilla Susana Soca, Soca',x:'Visita a la capilla, fuera de Montevideo. Organiza: Intendencia de Canelones.'},
-{n:'Iglesia de Eladio Dieste (Cristo Obrero)',no:1,b:'Estación Atlántida',z:'CN',t:['arq'],dur:45,o:{s:[['10:00','12:00']]},q:'Iglesia Cristo Obrero, Estación Atlántida',x:'Obra del ingeniero Eladio Dieste, fuera de Montevideo. Organización sin confirmar.'}
+{n:'Iglesia de Eladio Dieste (Cristo Obrero)',no:1,b:'Estación Atlántida',z:'CN',t:['arq'],dur:45,o:{s:[['10:00','12:00']]},q:'Iglesia Cristo Obrero, Estación Atlántida',x:'Obra del ingeniero Eladio Dieste, fuera de Montevideo. Organización sin confirmar.'},
+{n:'Asterisco Tienda Taller: charlas con autores',no:1,b:'Ciudad Vieja',z:'CV',t:['arte'],dur:40,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Charlas sobre trabajos culturales vinculados al patrimonio edilicio de la ciudad. Sarandí 251. Organiza: Asterisco Tienda Taller.'},
+{n:'Bar Galatea: milonga de cierre',no:1,b:'La Blanqueada',z:'ES',t:['mus'],dur:90,o:{d:[['19:30','22:00']]},q:'Bar Galatea, Luis Alberto de Herrera y Galatea',x:'Milonga para cerrar el fin de semana del Patrimonio, con promo de vermut. Musicaliza Cami Cedrés. Organiza: Bar Galatea.'}
 ];
 
 /* ---------- Helpers ---------- */
@@ -725,7 +741,7 @@ D.forEach((a,i)=>{
 });
 
 /* ---------- State ---------- */
-const S = { day:'s', from:toMin('11:00'), to:toMin('17:00'), ints:new Set(['ind']), zone:'CV', radius:'near', pace:1, acc:false, nores:false, pinned:new Set(), excluded:new Set(), order:null, swapped:new Set(), nRemoved:0, noise:null };
+const S = { day:'s', from:toMin('11:00'), to:toMin('17:00'), ints:new Set(['ind']), zone:'CV', radius:'near', pace:1, acc:false, nores:false, dry:false, pinned:new Set(), excluded:new Set(), order:null, swapped:new Set(), nRemoved:0, noise:null };
 
 /* ---------- UI setup ---------- */
 function frieze(){
@@ -786,6 +802,7 @@ function candidates(){
     if(!O.length && !E.length) continue;
     if(S.acc && !a.acc) continue;
     if(S.nores && a.res) continue;
+    if(S.dry && a.out===1) continue;
     if(!inRadius(a) && !S.pinned.has(a.id)) continue;
     const fits = O.some(([x,y])=>Math.min(y,S.to)-Math.max(x,S.from) >= 20) || E.some(([t,len])=>t>=S.from && t+Math.min(len,60)<=S.to);
     if(!fits) continue;
@@ -881,6 +898,7 @@ function mapQuery(a){
    'Ómnibus históricos de CUTCSA (Plaza Matriz)':'Plaza Matriz'
   };
   if(a.z==='CN') return (a.q || a.n) + ', Canelones, Uruguay';
+  if(a.q) return a.q + ', Montevideo, Uruguay';
   return (Q[a.n] || a.n.split(':')[0].replace(/\s*\(.*?\)\s*/g,' ').trim()) + ', Montevideo, Uruguay';
 }
 const gmap = a => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(mapQuery(a));
@@ -940,6 +958,14 @@ function renderMap(route,C){
   });
 }
 
+
+/* Weather badge: roof = techado, sun+cloud = aire libre, half = parte al aire libre */
+const WX = {
+  0:['Techado','<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>'],
+  1:['Al aire libre','<circle cx="9" cy="9" r="3.5"/><path d="M9 2.5v1.5M2.5 9H4M4.4 4.4l1 1M13.6 4.4l-1 1"/><path d="M8 19h10a3.5 3.5 0 0 0 0-7 5 5 0 0 0-9.6 1.4A2.8 2.8 0 0 0 8 19z"/>'],
+  2:['Parte al aire libre','<path d="M3 11l9-7 9 7"/><path d="M5 10v10h7"/><circle cx="17.5" cy="16" r="2.5"/><path d="M17.5 11.5v1M22 16h-1M14 16h-1M20.6 12.9l-.7.7M15.1 18.4l-.7.7"/>']
+};
+const wxTag = a => { const [l,g]=WX[a.out||0]; return `<span class="tag wx"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${g}</svg>${l}</span>`; };
 /* ---------- Scheduling a given order (manual edits and optimisation) ---------- */
 function mkC(a){ const sc=score(a); return {a, s:sc.s, hits:sc.hits}; }
 function lateReason(a,arr){
@@ -1016,6 +1042,7 @@ function render(){
         (a.acc?`<span class="tag plain">Accesible</span>`:'') +
         (a.res?`<span class="tag warn">Requiere reserva</span>`:'') +
         (S.pinned.has(a.id)?`<span class="tag warn">Agregada por vos</span>`:'') +
+        wxTag(a) +
         (a.no?`<span class="tag unof">Propuesta no oficial</span>`:'');
       const first=i===0, lastI=i===route.length-1;
       h += `<li class="stop${r.bad?' late':''}"><div class="time">${fmt(r.sl.st)}<small>a ${fmt(r.sl.en)}</small></div>
@@ -1085,7 +1112,7 @@ function render(){
     const a=c.a; const pk=c.hits[0]||a.t[0];
     return `<div class="alt" style="--c:var(--c-${pk})"><span class="g">${svg(pk,24)}</span><h3>${a.n}</h3>
       <div class="hrs">${a.b}. ${hoursText(a)}${a.res?'. Requiere reserva':''}</div>
-      <div class="tags">${c.hits.map(k=>`<span class="tag" style="--c:var(--c-${k})">${LABEL[k]}</span>`).join('')}${a.t.includes('ind')?'<span class="tag theme">Tema 2026</span>':''}${a.no?'<span class="tag unof">Propuesta no oficial</span>':''}</div>
+      <div class="tags">${c.hits.map(k=>`<span class="tag" style="--c:var(--c-${k})">${LABEL[k]}</span>`).join('')}${a.t.includes('ind')?'<span class="tag theme">Tema 2026</span>':''}${wxTag(a)}${a.no?'<span class="tag unof">Propuesta no oficial</span>':''}</div>
       <button data-p="${a.id}">Sumar al recorrido</button></div>`;
   }).join('') : `<div class="empty">No quedan otras opciones con estos filtros.</div>`;
   document.querySelectorAll('[data-p]').forEach(b=>b.addEventListener('click',()=>{
@@ -1131,6 +1158,7 @@ document.getElementById('to').addEventListener('change',e=>{S.to=+e.target.value
 document.getElementById('zone').addEventListener('change',e=>{S.zone=e.target.value; resetEdits(); S.noise=null; render();});
 document.getElementById('acc').addEventListener('change',e=>{S.acc=e.target.checked; render();});
 document.getElementById('nores').addEventListener('change',e=>{S.nores=e.target.checked; render();});
+document.getElementById('dry').addEventListener('change',e=>{S.dry=e.target.checked; resetEdits(); render();});
 document.getElementById('copyBtn').addEventListener('click',copyRoute);
 
 document.getElementById('luckyBtn').addEventListener('click',()=>{
@@ -1146,13 +1174,27 @@ document.getElementById('luckyBtn').addEventListener('click',()=>{
   toast('Sorpresa: ' + [...S.ints].map(k=>LABEL[k].toLowerCase()).join(', ') + ', desde ' + ZSHORT[S.zone]);
 });
 document.getElementById('restartBtn').addEventListener('click',()=>{
-  Object.assign(S,{day:'s',from:toMin('11:00'),to:toMin('17:00'),ints:new Set(['ind']),zone:'CV',radius:'near',pace:1,acc:false,nores:false,pinned:new Set(),excluded:new Set(),order:null,swapped:new Set(),nRemoved:0,noise:null});
+  Object.assign(S,{day:'s',from:toMin('11:00'),to:toMin('17:00'),ints:new Set(['ind']),zone:'CV',radius:'near',pace:1,acc:false,nores:false,dry:false,pinned:new Set(),excluded:new Set(),order:null,swapped:new Set(),nRemoved:0,noise:null});
   const setSeg=(id,v)=>document.querySelectorAll('#'+id+' button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===v)));
   setSeg('daySeg','s'); setSeg('radiusSeg','near'); setSeg('paceSeg','1');
   document.getElementById('from').value=S.from; document.getElementById('to').value=S.to; document.getElementById('zone').value=S.zone;
-  document.getElementById('acc').checked=false; document.getElementById('nores').checked=false;
-  fillChips(); render(); window.scrollTo({top:0,behavior:'auto'}); toast('Empezamos de nuevo');
+  document.getElementById('acc').checked=false; document.getElementById('nores').checked=false; document.getElementById('dry').checked=false;
+  fillChips(); render(); syncRain(); window.scrollTo({top:0,behavior:'auto'}); toast('Empezamos de nuevo');
 });
+
+/* Rain banner: toggles the "solo techado" filter */
+function syncRain(){
+  const on=S.dry;
+  document.getElementById('rainText').innerHTML = on ? '<strong>Mostrando solo actividades techadas.</strong> Lo que es al aire libre quedó afuera.' : '<strong>¿Llueve?</strong> Ahora podés quedarte solo con las actividades techadas.';
+  document.getElementById('rainBtn').textContent = on ? 'Ver todas' : 'Ver solo techadas';
+  document.getElementById('dry').checked = on;
+}
+document.getElementById('rainBtn').addEventListener('click',()=>{
+  S.dry=!S.dry; resetEdits(); render(); syncRain();
+  if(S.dry) document.getElementById('routeTitle').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+  try{ trackAction && trackAction('filtro_lluvia'); }catch(e){}
+});
+document.getElementById('dry').addEventListener('change',syncRain);
 document.getElementById('resetBtn').addEventListener('click',()=>{S.pinned.clear(); resetEdits(); S.noise=null; render(); toast('Cambios deshechos');});
 render();
 
@@ -1163,7 +1205,10 @@ const APPROVED = [
   {titulo:'Modo Casona: exposición, open studios y coctelería', organiza:'Modo Casona', lugar:'Sarandí 544, Ciudad Vieja', dia:'s', desde:600, hasta:1080, cat:'arte', desc:'Exposiciones, open studios, música en vivo y coctelería.'},
   {titulo:'Taller Alzáibar: Casa Abierta', organiza:'Taller Alzáibar', lugar:'Alzáibar 1261, Ciudad Vieja', dia:'s', desde:900, hasta:1200, cat:'arte', desc:'Una casa que también es taller, refugio y espacio de encuentro, construida desde la autogestión.'},
   {titulo:'Capilla Susana Soca', organiza:'Intendencia de Canelones', lugar:'Soca, Canelones (fuera de Montevideo)', dia:'s', desde:600, hasta:720, cat:'arq', desc:''},
-  {titulo:'Iglesia de Eladio Dieste (Cristo Obrero)', organiza:'Organización sin confirmar', lugar:'Estación Atlántida, Canelones (fuera de Montevideo)', dia:'s', desde:600, hasta:720, cat:'arq', desc:''}
+  {titulo:'Iglesia de Eladio Dieste (Cristo Obrero)', organiza:'Organización sin confirmar', lugar:'Estación Atlántida, Canelones (fuera de Montevideo)', dia:'s', desde:600, hasta:720, cat:'arq', desc:''},
+  {titulo:'Asterisco Tienda Taller: charlas con autores', organiza:'Asterisco Tienda Taller', lugar:'Sarandí 251, Ciudad Vieja', dia:'s', desde:600, hasta:1080, cat:'arte', desc:'Charlas sobre trabajos culturales vinculados al patrimonio edilicio de la ciudad.'},
+  {titulo:'Asterisco Tienda Taller: charlas con autores', organiza:'Asterisco Tienda Taller', lugar:'Sarandí 251, Ciudad Vieja', dia:'d', desde:600, hasta:1080, cat:'arte', desc:'Charlas sobre trabajos culturales vinculados al patrimonio edilicio de la ciudad.'},
+  {titulo:'Bar Galatea: milonga de cierre', organiza:'Bar Galatea', lugar:'Luis Alberto de Herrera y Galatea, La Blanqueada', dia:'d', desde:1170, hasta:1320, cat:'mus', desc:'Tango y milonga para cerrar el finde, con promo de vermut. Musicaliza Cami Cedrés.'}
 ];
 const P = { day:'s', cat:null, listDay:'s', items:[], uid:null, owner:false, db:null, ro:false };
 (function initCommunityForm(){
