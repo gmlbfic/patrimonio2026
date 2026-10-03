@@ -365,6 +365,7 @@ footer p{max-width:85ch;line-height:1.65}
     <div class="field checks">
       <label><input type="checkbox" id="acc"> Solo lugares con accesibilidad universal declarada</label>
       <label><input type="checkbox" id="nores"> Evitar propuestas que piden reserva o inscripción</label>
+      <label><input type="checkbox" id="kids"> Voy con niños <span class="hint" style="margin:0">(prioriza lo pensado para chicos, sin sacar lo demás)</span></label>
       <label><input type="checkbox" id="dry"> Solo techado, por si llueve <span class="hint" style="margin:0">(saca todo lo que tiene partes al aire libre)</span></label>
     </div>
   </aside>
@@ -569,7 +570,7 @@ const D = [
 {n:'Puerto de Montevideo (ANP)',out:1,b:'Ciudad Vieja',z:'CV',t:['ofi'],dur:40,o:{s:[['09:00','17:00']],d:[['09:00','17:00']]},x:'Grúas antiguas, telémetro del Graf Spee y vista de la operativa. Acceso Yacaré.'},
 {n:'Al Maestro Taller',b:'Ciudad Vieja',z:'CV',t:['arte','ind'],dur:40,o:{s:[['10:00','12:30']],d:[['10:00','12:30']]},x:'Taller abierto; el sábado se fabrican pinturas con materiales naturales.',r:'Talleres de pinturas naturales (sáb. 14 y 16 h) con inscripción: almaestrotaller@gmail.com'},
 {n:'Archivo Nacional de la Imagen y la Palabra',b:'Ciudad Vieja',z:'CV',t:['mus','mem'],dur:30,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Muestra "Opus 95" sobre la Orquesta Sinfónica del Sodre.'},
-{n:'Base Naval del Puerto',out:2,b:'Ciudad Vieja',z:'CV',t:['fam','mem'],dur:75,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Buques, demostraciones de buzos, helicóptero, velero Capitán Miranda y banda de la Armada.'},
+{n:'Base Naval del Puerto',grp:'basenaval',out:2,b:'Ciudad Vieja',z:'CV',t:['fam','mem'],dur:75,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Buques, demostraciones de buzos, helicóptero, velero Capitán Miranda y banda de la Armada.'},
 {n:'Casa Lavalleja (Museo Histórico Nacional)',b:'Ciudad Vieja',z:'CV',t:['mem','gas'],dur:45,o:{s:[['12:00','18:00']],d:[['12:00','18:00']]},ev:{s:[['14:00',45,'Visita a "El mantel como bandera": alimentación e identidad'],['15:30',45,'Visita a "El mantel como bandera"']],d:[['14:00',45,'Visita a "El mantel como bandera": alimentación e identidad'],['15:30',45,'Visita a "El mantel como bandera"']]},x:'Salas y patios; planta alta por escalera.'},
 {n:'Casa Montero (Museo Romántico)',b:'Ciudad Vieja',z:'CV',t:['mem','arq'],dur:40,o:{s:[['12:00','18:00']],d:[['12:00','18:00']]},ev:{s:[['15:00',45,'Hemeroteca con materiales sobre temática indígena']],d:[['15:00',45,'Hemeroteca con materiales sobre temática indígena']]},x:'Museo Romántico, sala de Musicología y hemeroteca.'},
 {n:'Casa Rivera (Museo Histórico Nacional)',b:'Ciudad Vieja',z:'CV',t:['ind','mem'],dur:45,ev:{s:[['14:30',45,'Recorrido mediado por la exposición sobre raíces indígenas'],['16:00',45,'Recorrido mediado']],d:[['14:30',45,'Recorrido mediado por la exposición sobre raíces indígenas'],['16:00',45,'Recorrido mediado']]},x:'Exposición temporal diseñada para la consigna 2026.'},
@@ -727,7 +728,8 @@ const D = [
 {n:'Asterisco Tienda Taller: charlas con autores',no:1,b:'Ciudad Vieja',z:'CV',t:['arte'],dur:40,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Charlas sobre trabajos culturales vinculados al patrimonio edilicio de la ciudad. Sarandí 251. Organiza: Asterisco Tienda Taller.'},
 {n:'Bar Galatea: milonga de cierre',no:1,b:'La Blanqueada',z:'ES',t:['mus'],dur:90,o:{d:[['19:30','22:00']]},q:'Bar Galatea, Luis Alberto de Herrera y Galatea',x:'Milonga para cerrar el fin de semana del Patrimonio, con promo de vermut. Musicaliza Cami Cedrés. Organiza: Bar Galatea.'},
 {n:'Performance "Retomada charrúa en la Atenas del Plata"',no:1,grp:'conacha',b:'Centro',z:'CE',t:['ind','arte'],dur:60,ev:{s:[['15:30',60,'Performance "Retomada charrúa en la Atenas del Plata"']]},q:'Universidad de la República, Av. 18 de Julio 1824',x:'Performance del Consejo de la Nación Charrúa (CONACHA) en la sede central de la Udelar.'},
-{n:'Génesis: taller de artistas',no:1,b:'Ciudad Vieja',z:'CV',t:['arte'],dur:40,o:{s:[['12:00','18:00']],d:[['12:00','18:00']]},q:'25 de Mayo 260',x:'Un taller de artistas que abre sus puertas para mostrar sus procesos y obras. 25 de Mayo 260. Organiza: Génesis.'}
+{n:'Génesis: taller de artistas',no:1,b:'Ciudad Vieja',z:'CV',t:['arte'],dur:40,o:{s:[['12:00','18:00']],d:[['12:00','18:00']]},q:'25 de Mayo 260',x:'Un taller de artistas que abre sus puertas para mostrar sus procesos y obras. 25 de Mayo 260. Organiza: Génesis.'},
+{n:'Base Naval del Puerto: visita del domingo',no:1,grp:'basenaval',out:2,b:'Ciudad Vieja',z:'CV',t:['arq','fam','mem'],dur:75,o:{d:[['10:00','12:00']]},q:'Base Naval del Puerto, Rambla 25 de Agosto',x:'Visita propuesta por la Armada Nacional para el domingo de 10 a 12 h. Rambla 25 de Agosto.'}
 ];
 
 /* ---------- Helpers ---------- */
@@ -743,7 +745,7 @@ D.forEach((a,i)=>{
 });
 
 /* ---------- State ---------- */
-const S = { day:'s', from:toMin('11:00'), to:toMin('17:00'), ints:new Set(['ind']), zone:'CV', radius:'near', pace:1, acc:false, nores:false, dry:false, pinned:new Set(), excluded:new Set(), order:null, swapped:new Set(), nRemoved:0, noise:null };
+const S = { day:'s', from:toMin('11:00'), to:toMin('17:00'), ints:new Set(['ind']), zone:'CV', radius:'near', pace:1, acc:false, nores:false, dry:false, kids:false, pinned:new Set(), excluded:new Set(), order:null, swapped:new Set(), nRemoved:0, noise:null };
 
 /* ---------- UI setup ---------- */
 function frieze(){
@@ -765,7 +767,7 @@ function fillZones(){
 }
 function fillChips(){
   const c = document.getElementById('chips');
-  c.innerHTML = INTERESTS.map(([k,l])=>`<button class="chip" style="--c:var(--c-${k})" data-k="${k}" aria-pressed="${S.ints.has(k)}"><span class="dot">${svg(k,17)}</span><span>${l}</span></button>`).join('');
+  c.innerHTML = INTERESTS.filter(([k])=>k!=='fam').map(([k,l])=>`<button class="chip" style="--c:var(--c-${k})" data-k="${k}" aria-pressed="${S.ints.has(k)}"><span class="dot">${svg(k,17)}</span><span>${l}</span></button>`).join('');
   c.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{
     const k=b.dataset.k; S.ints.has(k)?S.ints.delete(k):S.ints.add(k);
     b.setAttribute('aria-pressed',S.ints.has(k)); resetEdits(); S.noise=null; render();
@@ -783,7 +785,9 @@ function seg(id,key,parse=v=>v){
 function score(a){
   let s = 0; const hits = [];
   if(S.ints.size===0){ s = 1; }
-  else a.t.forEach(t=>{ if(S.ints.has(t)){ s+=3; hits.push(t);} });
+  else a.t.forEach(t=>{ if(t!=='fam' && S.ints.has(t)){ s+=3; hits.push(t);} });
+  // "Voy con niños" no filtra: suma prioridad a lo pensado para chicos, sin sacar lo demás
+  if(S.kids && a.t.includes('fam')){ s += 3; hits.push('fam'); }
   if(s>0 && a.t.includes('ind')) s += 1;
   if(S.pinned.has(a.id)) s += 50;
   return {s,hits};
@@ -1159,12 +1163,13 @@ document.getElementById('from').addEventListener('change',e=>{S.from=+e.target.v
 document.getElementById('to').addEventListener('change',e=>{S.to=+e.target.value; resetEdits(); S.noise=null; render();});
 document.getElementById('zone').addEventListener('change',e=>{S.zone=e.target.value; resetEdits(); S.noise=null; render();});
 document.getElementById('acc').addEventListener('change',e=>{S.acc=e.target.checked; render();});
+document.getElementById('kids').addEventListener('change',e=>{S.kids=e.target.checked; resetEdits(); render();});
 document.getElementById('nores').addEventListener('change',e=>{S.nores=e.target.checked; render();});
 document.getElementById('dry').addEventListener('change',e=>{S.dry=e.target.checked; resetEdits(); render();});
 document.getElementById('copyBtn').addEventListener('click',copyRoute);
 
 document.getElementById('luckyBtn').addEventListener('click',()=>{
-  const keys = INTERESTS.map(i=>i[0]).sort(()=>Math.random()-.5);
+  const keys = INTERESTS.map(i=>i[0]).filter(k=>k!=='fam').sort(()=>Math.random()-.5);
   const n = 2 + Math.floor(Math.random()*2);
   S.ints = new Set(keys.slice(0,n));
   S.zone = ['CV','CE','CV','CE','ES','NO','CA','OE'][Math.floor(Math.random()*8)];
@@ -1176,11 +1181,11 @@ document.getElementById('luckyBtn').addEventListener('click',()=>{
   toast('Sorpresa: ' + [...S.ints].map(k=>LABEL[k].toLowerCase()).join(', ') + ', desde ' + ZSHORT[S.zone]);
 });
 document.getElementById('restartBtn').addEventListener('click',()=>{
-  Object.assign(S,{day:'s',from:toMin('11:00'),to:toMin('17:00'),ints:new Set(['ind']),zone:'CV',radius:'near',pace:1,acc:false,nores:false,dry:false,pinned:new Set(),excluded:new Set(),order:null,swapped:new Set(),nRemoved:0,noise:null});
+  Object.assign(S,{day:'s',from:toMin('11:00'),to:toMin('17:00'),ints:new Set(['ind']),zone:'CV',radius:'near',pace:1,acc:false,nores:false,dry:false,kids:false,pinned:new Set(),excluded:new Set(),order:null,swapped:new Set(),nRemoved:0,noise:null});
   const setSeg=(id,v)=>document.querySelectorAll('#'+id+' button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===v)));
   setSeg('daySeg','s'); setSeg('radiusSeg','near'); setSeg('paceSeg','1');
   document.getElementById('from').value=S.from; document.getElementById('to').value=S.to; document.getElementById('zone').value=S.zone;
-  document.getElementById('acc').checked=false; document.getElementById('nores').checked=false; document.getElementById('dry').checked=false;
+  document.getElementById('acc').checked=false; document.getElementById('nores').checked=false; document.getElementById('dry').checked=false; document.getElementById('kids').checked=false;
   fillChips(); render(); syncRain(); window.scrollTo({top:0,behavior:'auto'}); toast('Empezamos de nuevo');
 });
 
@@ -1213,6 +1218,7 @@ const APPROVED = [
   {titulo:'Performance "Retomada charrúa en la Atenas del Plata"', organiza:'CONACHA (Consejo de la Nación Charrúa)', lugar:'Udelar, sede central (18 de Julio 1824)', dia:'s', desde:930, hasta:990, cat:'ind', desc:''},
   {titulo:'Génesis: taller de artistas', organiza:'Génesis', lugar:'25 de Mayo 260, Ciudad Vieja', dia:'s', desde:720, hasta:1080, cat:'arte', desc:'Un taller de artistas que abre sus puertas para mostrar sus procesos y obras.'},
   {titulo:'Génesis: taller de artistas', organiza:'Génesis', lugar:'25 de Mayo 260, Ciudad Vieja', dia:'d', desde:720, hasta:1080, cat:'arte', desc:'Un taller de artistas que abre sus puertas para mostrar sus procesos y obras.'},
+  {titulo:'Base Naval del Puerto: visita del domingo', organiza:'Armada Nacional', lugar:'Rambla 25 de Agosto, Ciudad Vieja', dia:'d', desde:600, hasta:720, cat:'arq', desc:''},
   {titulo:'Bar Galatea: milonga de cierre', organiza:'Bar Galatea', lugar:'Luis Alberto de Herrera y Galatea, La Blanqueada', dia:'d', desde:1170, hasta:1320, cat:'mus', desc:'Tango y milonga para cerrar el finde, con promo de vermut. Musicaliza Cami Cedrés.'}
 ];
 const P = { day:'s', cat:null, listDay:'s', items:[], uid:null, owner:false, db:null, ro:false };
