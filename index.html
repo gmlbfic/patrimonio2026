@@ -281,7 +281,7 @@ footer p{max-width:85ch;line-height:1.65}
 <div class="rainbar" id="rainbar" role="region" aria-label="Aviso de lluvia">
   <div class="rainbar-in">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 15h10a4 4 0 0 0 0-8 5.5 5.5 0 0 0-10.6 1.6A3.2 3.2 0 0 0 7 15z"/><path d="M8 18l-1 3M12 18l-1 3M16 18l-1 3"/></svg>
-    <span id="rainText"><strong>¿Llueve?</strong> Ahora podés quedarte solo con las actividades techadas.</span>
+    <span id="rainText"><strong>¿Llueve? Que nada te detenga.</strong> Ahora podés filtrar por actividades techadas.</span>
     <button type="button" id="rainBtn">Ver solo techadas</button>
   </div>
 </div>
@@ -538,7 +538,7 @@ const D = [
 {n:'Bar Paysandú',b:'Centro',z:'CE',t:['gas','ind'],dur:45,o:{s:[['12:00','18:00']],d:[['12:00','18:00']]},x:'Tapas y pinchos con guiño a la alimentación ancestral.'},
 {n:'Biblioteca y Museo Pedagógicos',b:'Centro',z:'CE',t:['ind','fam','mem'],acc:1,dur:45,ev:{s:[['10:30',60,'Álbum interactivo "Conectando con nuestras raíces"'],['11:30',45,'Francisco de los Santos, el chasque guaraní de Artigas'],['14:00',60,'Trabajo interactivo con alumnos'],['15:30',45,'Francisco de los Santos, el chasque guaraní de Artigas']],d:[['10:30',60,'Álbum interactivo "Conectando con nuestras raíces"'],['16:00',60,'Ponencia de Oscar Padrón: herencia indígena']]},x:'Exposición sobre representaciones de indígenas en álbumes de figuritas.'},
 {n:'Capilla y Colegio del Huerto',b:'Centro',z:'CE',t:['arq','mem'],acc:1,dur:45,o:{s:[['13:00','17:00']],d:[['13:00','17:00']]},x:'Primera escuela de mujeres (1864); visitas guiadas y charlas.'},
-{n:'Casa Mayor Udelar: ceremonia charrúa',b:'Centro',z:'CE',t:['ind'],dur:45,o:{s:[['10:00','18:00']]},x:'Performance de ceremonia indígena charrúa (Consejo de la Nación Charrúa).'},
+{n:'Casa Mayor Udelar: ceremonia charrúa',grp:'conacha',b:'Centro',z:'CE',t:['ind'],dur:45,o:{s:[['10:00','18:00']]},x:'Performance de ceremonia indígena charrúa (Consejo de la Nación Charrúa).'},
 {n:'Centro de Exposiciones Subte',b:'Centro',z:'CE',t:['arte'],acc:1,dur:45,o:{s:[['12:00','18:45']],d:[['12:00','18:45']]},ev:{s:[['14:00',60,'Charla y ensayo abierto "De esto no se habla x25"']]},x:'Rulfo Álvarez, obra reunida de Dani Umpi y Proyecto Mulita.'},
 {n:'Centro de Fotografía de Montevideo',out:2,b:'Centro',z:'CE',t:['arte','ind'],dur:45,o:{s:[['09:30','14:30']],d:[['09:30','14:30']]},x:'Muestra "Raíces indígenas" en Plaza Independencia y exposiciones en la sede de 18 de Julio.'},
 {n:'Clube Brasileiro',b:'Centro',z:'CE',t:['col','mus','arq'],acc:1,dur:30,o:{s:[['10:00','15:00']]},ev:{s:[['12:00',30,'Coro del Clube']]},x:'Historia del club.'},
@@ -725,7 +725,9 @@ const D = [
 {n:'Capilla Susana Soca',no:1,b:'Soca',z:'CN',t:['arq'],dur:45,o:{s:[['10:00','12:00']]},q:'Capilla Susana Soca, Soca',x:'Visita a la capilla, fuera de Montevideo. Organiza: Intendencia de Canelones.'},
 {n:'Iglesia de Eladio Dieste (Cristo Obrero)',no:1,b:'Estación Atlántida',z:'CN',t:['arq'],dur:45,o:{s:[['10:00','12:00']]},q:'Iglesia Cristo Obrero, Estación Atlántida',x:'Obra del ingeniero Eladio Dieste, fuera de Montevideo. Organización sin confirmar.'},
 {n:'Asterisco Tienda Taller: charlas con autores',no:1,b:'Ciudad Vieja',z:'CV',t:['arte'],dur:40,o:{s:[['10:00','18:00']],d:[['10:00','18:00']]},x:'Charlas sobre trabajos culturales vinculados al patrimonio edilicio de la ciudad. Sarandí 251. Organiza: Asterisco Tienda Taller.'},
-{n:'Bar Galatea: milonga de cierre',no:1,b:'La Blanqueada',z:'ES',t:['mus'],dur:90,o:{d:[['19:30','22:00']]},q:'Bar Galatea, Luis Alberto de Herrera y Galatea',x:'Milonga para cerrar el fin de semana del Patrimonio, con promo de vermut. Musicaliza Cami Cedrés. Organiza: Bar Galatea.'}
+{n:'Bar Galatea: milonga de cierre',no:1,b:'La Blanqueada',z:'ES',t:['mus'],dur:90,o:{d:[['19:30','22:00']]},q:'Bar Galatea, Luis Alberto de Herrera y Galatea',x:'Milonga para cerrar el fin de semana del Patrimonio, con promo de vermut. Musicaliza Cami Cedrés. Organiza: Bar Galatea.'},
+{n:'Performance "Retomada charrúa en la Atenas del Plata"',no:1,grp:'conacha',b:'Centro',z:'CE',t:['ind','arte'],dur:60,ev:{s:[['15:30',60,'Performance "Retomada charrúa en la Atenas del Plata"']]},q:'Universidad de la República, Av. 18 de Julio 1824',x:'Performance del Consejo de la Nación Charrúa (CONACHA) en la sede central de la Udelar.'},
+{n:'Génesis: taller de artistas',no:1,b:'Ciudad Vieja',z:'CV',t:['arte'],dur:40,o:{s:[['12:00','18:00']],d:[['12:00','18:00']]},q:'25 de Mayo 260',x:'Un taller de artistas que abre sus puertas para mostrar sus procesos y obras. 25 de Mayo 260. Organiza: Génesis.'}
 ];
 
 /* ---------- Helpers ---------- */
@@ -1185,7 +1187,7 @@ document.getElementById('restartBtn').addEventListener('click',()=>{
 /* Rain banner: toggles the "solo techado" filter */
 function syncRain(){
   const on=S.dry;
-  document.getElementById('rainText').innerHTML = on ? '<strong>Mostrando solo actividades techadas.</strong> Quedó afuera todo lo que es al aire libre, total o parcialmente.' : '<strong>¿Llueve?</strong> Ahora podés quedarte solo con las actividades techadas.';
+  document.getElementById('rainText').innerHTML = on ? '<strong>Mostrando solo actividades techadas.</strong> Quedó afuera todo lo que es al aire libre, total o parcialmente.' : '<strong>¿Llueve? Que nada te detenga.</strong> Ahora podés filtrar por actividades techadas.';
   document.getElementById('rainBtn').textContent = on ? 'Ver todas' : 'Ver solo techadas';
   document.getElementById('dry').checked = on;
 }
@@ -1208,6 +1210,9 @@ const APPROVED = [
   {titulo:'Iglesia de Eladio Dieste (Cristo Obrero)', organiza:'Organización sin confirmar', lugar:'Estación Atlántida, Canelones (fuera de Montevideo)', dia:'s', desde:600, hasta:720, cat:'arq', desc:''},
   {titulo:'Asterisco Tienda Taller: charlas con autores', organiza:'Asterisco Tienda Taller', lugar:'Sarandí 251, Ciudad Vieja', dia:'s', desde:600, hasta:1080, cat:'arte', desc:'Charlas sobre trabajos culturales vinculados al patrimonio edilicio de la ciudad.'},
   {titulo:'Asterisco Tienda Taller: charlas con autores', organiza:'Asterisco Tienda Taller', lugar:'Sarandí 251, Ciudad Vieja', dia:'d', desde:600, hasta:1080, cat:'arte', desc:'Charlas sobre trabajos culturales vinculados al patrimonio edilicio de la ciudad.'},
+  {titulo:'Performance "Retomada charrúa en la Atenas del Plata"', organiza:'CONACHA (Consejo de la Nación Charrúa)', lugar:'Udelar, sede central (18 de Julio 1824)', dia:'s', desde:930, hasta:990, cat:'ind', desc:''},
+  {titulo:'Génesis: taller de artistas', organiza:'Génesis', lugar:'25 de Mayo 260, Ciudad Vieja', dia:'s', desde:720, hasta:1080, cat:'arte', desc:'Un taller de artistas que abre sus puertas para mostrar sus procesos y obras.'},
+  {titulo:'Génesis: taller de artistas', organiza:'Génesis', lugar:'25 de Mayo 260, Ciudad Vieja', dia:'d', desde:720, hasta:1080, cat:'arte', desc:'Un taller de artistas que abre sus puertas para mostrar sus procesos y obras.'},
   {titulo:'Bar Galatea: milonga de cierre', organiza:'Bar Galatea', lugar:'Luis Alberto de Herrera y Galatea, La Blanqueada', dia:'d', desde:1170, hasta:1320, cat:'mus', desc:'Tango y milonga para cerrar el finde, con promo de vermut. Musicaliza Cami Cedrés.'}
 ];
 const P = { day:'s', cat:null, listDay:'s', items:[], uid:null, owner:false, db:null, ro:false };
